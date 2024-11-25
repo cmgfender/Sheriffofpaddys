@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>File Matching Tool V.01</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.6.2/fuse.min.js"></script>
+</head>
+<body>
+    <h1>File Matching Tool</h1>
+    <p>Upload two CSV files to perform matching and lookups. Configure matching fields and options below.</p>
+
+    <!-- File upload form -->
+    <form id="fileForm">
+        <div>
+            <label for="file1">Upload File 1:</label>
+            <input type="file" id="file1" accept=".csv" required />
+        </div>
+        <div>
+            <label for="file2">Upload File 2:</label>
+            <input type="file" id="file2" accept=".csv" required />
+        </div>
+        <button type="button" onclick="loadFiles()">Load Files</button>
+    </form>
+
+    <div id="configSection" style="display: none;">
+        <h2>Configuration</h2>
+        <p>Select the fields to match from both files and configure fuzzy matching options.</p>
+        <div>
+            <label for="field1">Field from File 1:</label>
+            <select id="field1"></select>
+        </div>
+        <div>
+            <label for="field2">Field from File 2:</label>
+            <select id="field2"></select>
+        </div>
+        <div>
+            <label for="threshold">Fuzzy Match Threshold (0 to 1):</label>
+            <input type="number" id="threshold" min="0" max="1" step="0.1" value="0.6" />
+        </div>
+        <button type="button" onclick="performMatching()">Perform Matching</button>
+    </div>
+
+    <p id="status"></p>
+    <a id="downloadLink" style="display: none;" download="matched_file.csv">Download Matched File</a>
+
+    <script>
+        let file1Data = null;
+        let file2Data = null;
+
+        function loadFiles() {
+            const file1Input = document.getElementById('file1');
+            const file2Input = document.getElementById('file2');
+            const status = document.getElementById('status');
+
+            if (!file1Input.files.length || !file2Input.files.length) {
+                status.innerText = "Please upload both files.";
+                return;
+            }
+
+            status.innerText = "Loading files...";
+
+            Papa.parse(file1Input.files[0], {
+                header: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    file1Data = results.data;
+                    populateFields('field1', results.meta.fields);
+                    if (file2Data) showConfigSection();
+                },
+                error: function(error) {
+                    status.innerText = "Error loading File 1: " + error.message;
+                }
+            });
+
+            Papa.parse(file2Input.files[0], {
+                header: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    file2Data = results.data;
+                    populateFields('field2', results.meta.fields);
+                    if (file1Data) showConfigSection();
+                },
+                error: function(error) {
+                    status.innerText = "Error loading File 2: " + error.message;
+                }
+            });
+        }
+
+        function populateFields(fieldId, fields) {
+            const select = document.getElementById(fieldId);
+            select.innerHTML = "";
+            fields.forEach(field => {
+                const option = document.createElement('option');
+                option.value = field;
+                option.text = field;
+                select.appendChild(option);
+            });
+        }
+
+        function showConfigSection() {
+            document.getElementById('configSection').style.display = 'block';
+            document.getElementById('status').innerText = "Files loaded successfully. Configure the matching below.";
+        }
+
+        function performMatching() {
+            const field1 = document.getElementById('field1').value;
+            const field2 = document.getElementById('field2').value;
+            const threshold = parseFloat(document.getElementById('threshold').value);
+            const status = document.getElementById('status');
+
+            if (!field1 || !field2) {
+                status.innerText = "Please select fields for matching.";
+                return;
+            }
+
+            status.innerText = "Performing matching...";
+
+            // Perform fuzzy matching
+            const fuse = new Fuse(file2Data, {
+                keys: [field2],
+                threshold: threshold
+            });
+
+            const matchedData = file1Data.map(row1 => {
+                const result = fuse.search(row1[field1]);
+                const bestMatch = result.length ? result[0].item : null;
+                return {
+                    ...row1,
+                    [`Matched ${field2}`]: bestMatch ? bestMatch[field2] : "No Match",
+                    ...bestMatch
+                };
+            });
+
+            // Convert matched data to CSV
+            const csvContent = Papa.unparse(matchedData);
+
+            // Create download link
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const downloadLink = document.getElementById('downloadLink');
+            downloadLink.href = url;
+            downloadLink.style.display = 'block';
+            status.innerText = "Matching complete. Click below to download.";
+        }
+    </script>
+</body>
+</html>
