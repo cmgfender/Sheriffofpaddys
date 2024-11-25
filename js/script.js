@@ -47,36 +47,34 @@ class Particle {
         if (this.y + this.radius > height || this.y - this.radius < 0) {
             this.dy *= -1;
         }
+    }
 
-        // Attract to mouse/touch
-        if (mouse.x && mouse.y) {
-            let dx = mouse.x - this.x;
-            let dy = mouse.y - this.y;
-            let dist = Math.sqrt(dx * dx + dy * dy);
-
-            if (dist < 200) {
-                this.x -= dx * 0.02;
-                this.y -= dy * 0.02;
-            }
-        }
+    isClicked(mouseX, mouseY) {
+        const dx = this.x - mouseX;
+        const dy = this.y - mouseY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        return distance < this.radius;
     }
 }
 
 // Mouse and touch tracking
-window.addEventListener('mousemove', (event) => {
-    mouse.x = event.clientX;
-    mouse.y = event.clientY;
+canvas.addEventListener('click', (event) => {
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = event.clientX - rect.left;
+    const mouseY = event.clientY - rect.top;
+
+    // Check if a particle is clicked
+    particles = particles.filter(particle => !particle.isClicked(mouseX, mouseY));
 });
 
-window.addEventListener('touchmove', (event) => {
+canvas.addEventListener('touchstart', (event) => {
+    const rect = canvas.getBoundingClientRect();
     const touch = event.touches[0];
-    mouse.x = touch.clientX;
-    mouse.y = touch.clientY;
-});
+    const mouseX = touch.clientX - rect.left;
+    const mouseY = touch.clientY - rect.top;
 
-window.addEventListener('touchend', () => {
-    mouse.x = null;
-    mouse.y = null;
+    // Check if a particle is clicked
+    particles = particles.filter(particle => !particle.isClicked(mouseX, mouseY));
 });
 
 // Resize handler
