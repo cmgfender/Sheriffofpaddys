@@ -23,11 +23,11 @@ const widgetContainer = document.getElementById('widgets');
 let currentWidgetIndex = 0;
 function loadWidget() {
     widgetContainer.innerHTML = `
-        <iframe src="${widgets[currentWidgetIndex].src}" title="${widgets[currentWidgetIndex].title}" style="width:100%; height:300px; border:none;"></iframe>
+        <iframe src="${widgets[currentWidgetIndex].src}" title="${widgets[currentWidgetIndex].title}" style="width:100%; height:400px; border:none; border-radius:10px;"></iframe>
     `;
     currentWidgetIndex = (currentWidgetIndex + 1) % widgets.length;
 }
 
 // Initial Load
 loadWidget();
-setInterval(loadWidget, 10000); // Rotate every 10 seconds
+setInterval(loadWidget, 8000); // Rotate every 8 seconds
