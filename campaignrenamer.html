@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Calabrio Campaign Renamer Alpha</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+</head>
+<body>
+    <h1>Calabrio Campaign Renamer Alpha</h1>
+    <p>Upload your CSV file, process it directly in the browser, and download the updated file.</p>
+
+    <form id="csvForm">
+        <input type="file" id="csvFile" accept=".csv" required />
+        <button type="button" onclick="processCSV()">Process File</button>
+    </form>
+
+    <p id="status"></p>
+    <a id="downloadLink" style="display: none;" download="processed_campaigns.csv">Download Processed File</a>
+
+    <script>
+        function processCSV() {
+            const fileInput = document.getElementById('csvFile');
+            const status = document.getElementById('status');
+            const downloadLink = document.getElementById('downloadLink');
+            downloadLink.style.display = 'none';
+            status.innerText = "Processing...";
+
+            if (!fileInput.files.length) {
+                status.innerText = "Please select a CSV file.";
+                return;
+            }
+
+            const file = fileInput.files[0];
+            Papa.parse(file, {
+                header: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    const data = results.data;
+                    const processedData = data.map(processRow);
+                    const csvContent = Papa.unparse(processedData);
+
+                    // Create download link
+                    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+                    const url = URL.createObjectURL(blob);
+                    downloadLink.href = url;
+                    downloadLink.style.display = "block";
+                    status.innerText = "Processing complete. Click below to download.";
+                },
+                error: function(error) {
+                    status.innerText = "Error processing file: " + error.message;
+                }
+            });
+        }
+
+        function processRow(row) {
+            const newRow = { ...row };
+
+            // Process Start Date and End Date
+            const startDate = row['Start Date'] ? new Date(row['Start Date']) : new Date('2024-01-01');
+            const endDate = row['End Date'] ? new Date(row['End Date']) : new Date(startDate);
+            endDate.setMonth(endDate.getMonth() + 6);
+            if (endDate.getFullYear() > 2024) endDate.setFullYear(2024, 11, 31);
+            newRow['Start Date'] = formatDate(startDate);
+            newRow['End Date'] = formatDate(endDate);
+
+            // Classify Region
+            newRow['Region'] = classifyRegion(row['Campaign Name']);
+            newRow['Sub-Region'] = classifySubRegion(row['Campaign Name'], newRow['Region']);
+
+            // Classify Product Focus
+            newRow['Product Focus'] = classifyProductFocus(row['Campaign Name']);
+
+            // Classify Type
+            newRow['Type'] = classifyType(row['Campaign Name']);
+
+            // Create New Campaign Name
+            newRow['New Campaign Name'] = `${newRow['Region']} | ${newRow['Sub-Region'] || ''} | ${newRow['Type']} | ${new Date(newRow['Start Date']).getFullYear()} | ${row['Campaign Name']}`;
+            
+            return newRow;
+        }
+
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function classifyRegion(name) {
+            name = name.toLowerCase();
+            if (name.includes('europe') || name.includes('middle east') || name.includes('africa')) return 'EMEA';
+            if (name.includes('latin america') || name.includes('latam')) return 'LATAM';
+            if (name.includes('asia') || name.includes('apac')) return 'APAC';
+            if (name.includes('us') || name.includes('canada')) return 'North America';
+            return 'Global';
+        }
+
+        function classifySubRegion(name, region) {
+            name = name.toLowerCase();
+            if (region === 'North America') {
+                if (name.includes('central')) return 'US-Central';
+                if (name.includes('east')) return 'US-East';
+                if (name.includes('west')) return 'US-West';
+            } else if (region === 'EMEA') {
+                if (name.includes('uk')) return 'UKI-UK';
+                if (name.includes('ireland')) return 'UKI-Ireland';
+            }
+            return '';
+        }
+
+        function classifyProductFocus(name) {
+            name = name.toLowerCase();
+            if (name.includes('quality management') || name.includes('qm')) return 'QM';
+            if (name.includes('workforce management') || name.includes('wfm')) return 'WFM';
+            if (name.includes('analytics')) return 'Analytics';
+            if (name.includes('call summarization')) return 'Call Summarization';
+            if (name.includes('bot analytics')) return 'Bot Analytics';
+            return 'Suite';
+        }
+
+        function classifyType(name) {
+            name = name.toLowerCase();
+            if (name.includes('linkedin')) return 'Paid Social';
+            if (name.includes('6sense')) return 'Dark Funnel';
+            if (name.includes('drift')) return 'Chat';
+            if (name.includes('webinar') || name.includes('wod')) return 'Webinar';
+            return 'Unknown';
+        }
+    </script>
+</body>
+</html>
