@@ -17,7 +17,7 @@ const widgets = [
     }
 ];
 
-const widgetContainer = document.getElementById('widgets');
+const widgetContainer = document.getElementById('widget-container');
 
 // Rotate Widgets
 let currentWidgetIndex = 0;

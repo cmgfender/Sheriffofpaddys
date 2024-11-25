@@ -5,48 +5,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Charles Glass Portfolio</title>
     <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;700&family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <header>
-        <div class="header-image">
-            <img src="header.webp" alt="Header Image">
-            <div class="overlay">
-                <h1>Charles Glass</h1>
-                <h2>Marketing Pro | Grill Master | Guitar Enthusiast</h2>
-                <nav>
-                    <a href="#about">About</a>
-                    <a href="#skills">Skills</a>
-                    <a href="#interests">What I'm Into</a>
-                </nav>
-            </div>
+        <div class="navbar">
+            <h1 class="logo">Charles Glass</h1>
+            <nav>
+                <a href="#about">About</a>
+                <a href="#skills">Skills</a>
+                <a href="#interests">What I'm Into</a>
+                <a href="#contact">Contact</a>
+            </nav>
+        </div>
+        <div class="hero">
+            <h1>Marketing with Precision</h1>
+            <p>Creating innovative strategies, driving results, and turning ideas into impact. Meet a marketer who lives to grill, explore, and strum a melody.</p>
         </div>
     </header>
     <main>
-        <section class="about" id="about">
-            <h2>About Me</h2>
-            <p>An accomplished marketing professional with expertise in CRM systems, automation, SEO, and digital strategies. A Philadelphia native who loves grilling, playing guitar, and exploring the best beers and cheesesteaks in the city with my black lab, Rocky.</p>
+        <section id="about" class="section about">
+            <div class="content">
+                <h2>About Me</h2>
+                <p>I’m an accomplished marketing professional with expertise in CRM systems, automation, SEO, and digital strategies. I live in Philadelphia with my black lab, Rocky, and enjoy grilling, guitar, and the best beers and cheesesteaks the city has to offer.</p>
+            </div>
         </section>
-        <section class="skills" id="skills">
-            <h2>Skills</h2>
-            <ul>
-                <li>Marketing Automation</li>
-                <li>SEO/SEM</li>
-                <li>Salesforce CRM</li>
-                <li>HubSpot</li>
-                <li>Pardot</li>
-                <li>Google Ads</li>
-            </ul>
+        <section id="skills" class="section skills">
+            <div class="content">
+                <h2>Skills</h2>
+                <div class="grid">
+                    <div class="card">Marketing Automation</div>
+                    <div class="card">SEO/SEM</div>
+                    <div class="card">Salesforce CRM</div>
+                    <div class="card">HubSpot</div>
+                    <div class="card">Pardot</div>
+                    <div class="card">Google Ads</div>
+                </div>
+            </div>
         </section>
-        <section class="interests" id="interests">
-            <h2>What I'm Into</h2>
-            <div id="widgets">
-                <!-- Dynamic widgets loaded here -->
+        <section id="interests" class="section interests">
+            <div class="content">
+                <h2>What I'm Into</h2>
+                <div id="widget-container">
+                    <!-- Widgets dynamically injected -->
+                </div>
             </div>
         </section>
     </main>
     <footer>
-        <p>&copy; 2024 Charles Glass. Crafted with care and cheesesteaks in Philly.</p>
+        <div class="footer-content">
+            <p>&copy; 2024 Charles Glass. Designed with inspiration and simplicity in mind.</p>
+        </div>
     </footer>
     <script src="scripts.js"></script>
 </body>
