@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>IH2F - I Have Two Files</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom Styles -->
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 900px;
+            margin-top: 50px;
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .brand-logo {
+            width: 50px;
+            margin-right: 15px;
+        }
+        h1 {
+            font-weight: 700;
+            margin-bottom: 30px;
+        }
+        .form-label {
+            font-weight: 600;
+        }
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+        #output {
+            margin-top: 40px;
+        }
+        table {
+            margin-top: 20px;
+        }
+        .footer {
+            margin-top: 60px;
+            padding: 20px 0;
+            text-align: center;
+            color: #6c757d;
+            border-top: 1px solid #dee2e6;
+        }
+        .code-block {
+            background-color: #1e1e1e;
+            color: #dcdcdc;
+            padding: 20px;
+            border-radius: 6px;
+            font-family: Consolas, monospace;
+            overflow-x: auto;
+        }
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: none;
+        }
+        .select2-container .select2-selection--single {
+            height: 45px;
+            padding: 6px 12px;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 45px;
+        }
+    </style>
+    <!-- Select2 CSS for enhanced select dropdowns -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+</head>
+<body>
+    <div class="container">
+        <div class="d-flex align-items-center mb-4">
+            <img src="https://img.icons8.com/fluency/48/000000/file-comparison.png" alt="Logo" class="brand-logo">
+            <h1>IH2F - I Have Two Files</h1>
+        </div>
+
+        <form id="fileForm">
+            <div class="mb-4">
+                <label for="file1" class="form-label">Upload First File:</label>
+                <input class="form-control" type="file" id="file1" accept=".csv, .json">
+            </div>
+
+            <div class="mb-4">
+                <label for="file2" class="form-label">Upload Second File:</label>
+                <input class="form-control" type="file" id="file2" accept=".csv, .json">
+            </div>
+
+            <div class="mb-4">
+                <label for="keySelect" class="form-label">Select Key Column(s):</label>
+                <input type="text" class="form-control" id="keySelect" placeholder="Enter key column name(s), separated by commas">
+            </div>
+
+            <div class="mb-4">
+                <label for="functionSelect" class="form-label">Select a Function:</label>
+                <select id="functionSelect" class="form-select">
+                    <optgroup label="Data Merging and Joining">
+                        <option value="1">1. Inner Join</option>
+                        <option value="2">2. Left (Outer) Join</option>
+                        <option value="3">3. Right (Outer) Join</option>
+                        <option value="4">4. Full Outer Join</option>
+                        <option value="5">5. Cross Join</option>
+                        <option value="6">6. Merge with Multiple Keys</option>
+                        <option value="7">7. Concatenate Columns</option>
+                        <option value="8">8. Hierarchical Merge</option>
+                    </optgroup>
+                    <optgroup label="Data Comparison and Analysis">
+                        <option value="9">9. Difference/Subtraction</option>
+                        <option value="10">10. Intersection</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <button type="button" id="processBtn" class="btn btn-primary">Process Files</button>
+        </form>
+
+        <div id="output">
+            <h2 class="mt-5">Output:</h2>
+            <div id="outputContent">No output yet.</div>
+        </div>
+    </div>
+
+    <div class="footer">
+        &copy; 2023 IH2F Application. All rights reserved.
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Select2 JS for enhanced select dropdowns -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <!-- Custom Script -->
+    <script>
+        // Initialize Select2
+        document.addEventListener('DOMContentLoaded', function() {
+            $('#functionSelect').select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder: 'Select a function',
+            });
+        });
+
+        document.getElementById('processBtn').addEventListener('click', function() {
+            const fileInput1 = document.getElementById('file1');
+            const fileInput2 = document.getElementById('file2');
+            const functionSelect = document.getElementById('functionSelect');
+            const keyInput = document.getElementById('keySelect');
+            const outputContent = document.getElementById('outputContent');
+
+            if (!fileInput1.files[0] || !fileInput2.files[0]) {
+                alert('Please upload both files.');
+                return;
+            }
+
+            const file1 = fileInput1.files[0];
+            const file2 = fileInput2.files[0];
+            const selectedFunction = functionSelect.value;
+            const keyColumns = keyInput.value.split(',').map(k => k.trim()).filter(k => k);
+
+            const reader1 = new FileReader();
+            const reader2 = new FileReader();
+
+            let data1, data2;
+
+            reader1.onload = function(e) {
+                data1 = parseData(e.target.result, file1.name);
+                reader2.readAsText(file2);
+            };
+
+            reader2.onload = function(e) {
+                data2 = parseData(e.target.result, file2.name);
+                performFunction(selectedFunction, data1, data2, keyColumns);
+            };
+
+            reader1.readAsText(file1);
+
+            function parseData(content, filename) {
+                if (filename.endsWith('.csv')) {
+                    return CSVToJSON(content);
+                } else if (filename.endsWith('.json')) {
+                    return JSON.parse(content);
+                } else {
+                    alert('Unsupported file format: ' + filename);
+                    return null;
+                }
+            }
+
+            function performFunction(func, data1, data2, keys) {
+                let result;
+                switch (func) {
+                    case '1':
+                        result = innerJoin(data1, data2, keys);
+                        break;
+                    case '2':
+                        result = leftOuterJoin(data1, data2, keys);
+                        break;
+                    case '3':
+                        result = rightOuterJoin(data1, data2, keys);
+                        break;
+                    case '4':
+                        result = fullOuterJoin(data1, data2, keys);
+                        break;
+                    case '5':
+                        result = crossJoin(data1, data2);
+                        break;
+                    case '6':
+                        result = innerJoin(data1, data2, keys); // Using innerJoin with multiple keys
+                        break;
+                    case '7':
+                        result = concatenateColumns(data1, data2);
+                        break;
+                    case '8':
+                        result = hierarchicalMerge(data1, data2, keys);
+                        break;
+                    case '9':
+                        result = difference(data1, data2, keys);
+                        break;
+                    case '10':
+                        result = intersection(data1, data2, keys);
+                        break;
+                    default:
+                        result = 'Function not implemented yet.';
+                }
+                displayResult(result);
+            }
+
+            // Implementations of the functions (same as before)
+            function innerJoin(data1, data2, keys) {
+                keys = keys.length ? keys : Object.keys(data1[0]);
+                const key = keys.join('_');
+                const map2 = new Map();
+                data2.forEach(item => {
+                    const keyValue = keys.map(k => item[k]).join('_');
+                    map2.set(keyValue, item);
+                });
+                const result = data1.reduce((acc, item) => {
+                    const keyValue = keys.map(k => item[k]).join('_');
+                    if (map2.has(keyValue)) {
+                        acc.push({...item, ...map2.get(keyValue)});
+                    }
+                    return acc;
+                }, []);
+                return result;
+            }
+
+            function leftOuterJoin(data1, data2, keys) {
+                keys = keys.length ? keys : Object.keys(data1[0]);
+                const key = keys.join('_');
+                const map2 = new Map();
+                data2.forEach(item => {
+                    const keyValue = keys.map(k => item[k]).join('_');
+                    map2.set(keyValue, item);
+                });
+                const result = data1.map(item => {
+                    const keyValue = keys.map(k => item[k]).join('_');
+                    if (map2.has(keyValue)) {
+                        return {...item, ...map2.get(keyValue)};
+                    } else {
+                        return {...item};
+                    }
+                });
+                return result;
+            }
+
+            function rightOuterJoin(data1, data2, keys) {
+                // Swap data1 and data2 and perform left outer join
+                return leftOuterJoin(data2, data1, keys);
+            }
+
+            function fullOuterJoin(data1, data2, keys) {
+                keys = keys.length ? keys : Object.keys(data1[0]);
+                const key = keys.join('_');
+                const map1 = new Map();
+                data1.forEach(item => {
+                    const keyValue = keys.map(k => item[k]).join('_');
+                    map1.set(keyValue, item);
+                });
+                const map2 = new Map();
+                data2.forEach(item => {
+                    const keyValue = keys.map(k => item[k]).join('_');
+                    map2.set(keyValue, item);
+                });
+                const allKeys = new Set([...map1.keys(), ...map2.keys()]);
+                const result = [];
+                allKeys.forEach(keyValue => {
+                    const item1 = map1.get(keyValue) || {};
+                    const item2 = map2.get(keyValue) || {};
+                    result.push({...item1, ...item2});
+                });
+                return result;
+            }
+
+            function crossJoin(data1, data2) {
+                const result = [];
+                data1.forEach(item1 => {
+                    data2.forEach(item2 => {
+                        result.push({...item1, ...item2});
+                    });
+                });
+                return result;
+            }
+
+            function concatenateColumns(data1, data2) {
+                const result = data1.map((item, index) => {
+                    const item2 = data2[index] || {};
+                    return {...item, ...item2};
+                });
+                return result;
+            }
+
+            function hierarchicalMerge(data1, data2, keys) {
+                // For simplicity, we'll assume a parent-child relationship based on keys
+                keys = keys.length ? keys : Object.keys(data1[0]);
+                const key = keys.join('_');
+                const map2 = new Map();
+                data2.forEach(item => {
+                    const keyValue = keys.map(k => item[k]).join('_');
+                    map2.set(keyValue, item);
+                });
+                const result = data1.map(item => {
+                    const keyValue = keys.map(k => item[k]).join('_');
+                    const children = map2.get(keyValue);
+                    return {...item, children: children ? [children] : []};
+                });
+                return result;
+            }
+
+            function difference(data1, data2, keys) {
+                keys = keys.length ? keys : Object.keys(data1[0]);
+                const key = keys.join('_');
+                const set2 = new Set(data2.map(item => keys.map(k => item[k]).join('_')));
+                const result = data1.filter(item => !set2.has(keys.map(k => item[k]).join('_')));
+                return result;
+            }
+
+            function intersection(data1, data2, keys) {
+                keys = keys.length ? keys : Object.keys(data1[0]);
+                const key = keys.join('_');
+                const set2 = new Set(data2.map(item => keys.map(k => item[k]).join('_')));
+                const result = data1.filter(item => set2.has(keys.map(k => item[k]).join('_')));
+                return result;
+            }
+
+            // Utility functions
+
+            function displayResult(result) {
+                if (Array.isArray(result)) {
+                    outputContent.innerHTML = generateTableHTML(result);
+                } else {
+                    outputContent.textContent = JSON.stringify(result, null, 2);
+                }
+            }
+
+            function generateTableHTML(data) {
+                if (data.length === 0) return '<p>No data to display.</p>';
+                const columns = Object.keys(data[0]);
+                let html = '<table><tr>';
+                columns.forEach(col => {
+                    html += `<th>${col}</th>`;
+                });
+                html += '</tr>';
+                data.forEach(row => {
+                    html += '<tr>';
+                    columns.forEach(col => {
+                        html += `<td>${row[col] !== undefined ? row[col] : ''}</td>`;
+                    });
+                    html += '</tr>';
+                });
+                html += '</table>';
+                return html;
+            }
+
+            function CSVToJSON(csv) {
+                const lines = csv.split(/\r?\n/);
+                const headers = lines[0].split(',');
+                const result = [];
+                for (let i = 1; i < lines.length; i++) {
+                    if (!lines[i]) continue;
+                    const obj = {};
+                    const currentline = lines[i].split(',');
+                    headers.forEach((header, index) => {
+                        obj[header.trim()] = currentline[index] ? currentline[index].trim() : '';
+                    });
+                    result.push(obj);
+                }
+                return result;
+            }
+        });
+    </script>
+</body>
+</html>
