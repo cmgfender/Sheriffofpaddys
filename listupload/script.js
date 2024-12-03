@@ -26,22 +26,20 @@ document.getElementById("processFile").addEventListener("click", () => {
       return;
     }
   
+    // Normalize column names to lowercase and trimmed
+    const normalizedRows = rows.map(row =>
+      Object.fromEntries(
+        Object.entries(row).map(([key, value]) => [key.trim().toLowerCase(), value])
+      )
+    );
+  
     // Phase 1: Basic Fields
-    const requiredFields = ['First Name', 'Last Name', 'Email', 'Company', 'Assign To', 'Country'];
-    const spellings = {
-      "First Name": ["First Name", "FirstName", "Vorname", "Nombre", "Fornafn"],
-      "Last Name": ["Last Name", "LastName", "Nachname", "Apellido", "Eftirnafn"],
-      "Email": ["Email", "email", "email "],
-      "Company": ["Company", "Firma", "Compañía", "Fyrirtæki"],
-      "Assign To": ["Assign To", "AssignTo", "Zuweisen", "Asignar", "Úthluta"],
-      "Country": ["Country", "Land", "País", "Landið"]
-    };
+    const requiredFields = ['first name', 'last name', 'email', 'company', 'assign to', 'country'];
+    const missingBasic = validateColumns(normalizedRows, requiredFields);
   
-    const missingBasic = validateColumns(rows, requiredFields, spellings);
-  
-    // "Country" can be used as a fallback for "Assign To"
-    if (missingBasic.includes("Assign To") && !missingBasic.includes("Country")) {
-      missingBasic.splice(missingBasic.indexOf("Assign To"), 1);
+    // Handle "Country" as a fallback for "Assign To"
+    if (missingBasic.includes("assign to") && !missingBasic.includes("country")) {
+      missingBasic.splice(missingBasic.indexOf("assign to"), 1);
     }
   
     if (missingBasic.length) {
@@ -50,14 +48,14 @@ document.getElementById("processFile").addEventListener("click", () => {
     }
   
     // Check if Name column needs splitting
-    const nameColumn = rows.some(row => "Name" in row);
+    const nameColumn = normalizedRows.some(row => "name" in row);
     if (nameColumn) {
       if (confirm("Do you want to split the 'Name' column into 'First Name' and 'Last Name'?")) {
-        rows.forEach(row => {
-          if (row.Name) {
-            const [firstName, ...lastName] = row.Name.split(" ");
-            row["First Name"] = firstName || "";
-            row["Last Name"] = lastName.join(" ") || "";
+        normalizedRows.forEach(row => {
+          if (row.name) {
+            const [firstName, ...lastName] = row.name.split(" ");
+            row["first name"] = firstName || "";
+            row["last name"] = lastName.join(" ") || "";
           }
         });
       } else {
@@ -67,25 +65,25 @@ document.getElementById("processFile").addEventListener("click", () => {
     }
   
     // Validate email domain for "Assign To"
-    if (!rows.every(row => row["Assign To"].endsWith("@calabrio.com"))) {
+    if (!normalizedRows.every(row => row["assign to"]?.endsWith("@calabrio.com"))) {
       output.innerHTML += "<p>Assign To must be an email ending in @calabrio.com.</p>";
       return;
     }
   
     // Phase 2: Optional Fields
-    const optionalFields = ["Phone", "Industry", "Job Title"];
-    const missingOptional = validateColumns(rows, optionalFields, spellings);
+    const optionalFields = ["phone", "industry", "job title"];
+    const missingOptional = validateColumns(normalizedRows, optionalFields);
     if (missingOptional.length) {
       output.innerHTML += `<p>Optional fields missing: ${missingOptional.join(", ")}. Follow-up might be harder.</p>`;
     }
   
     // Phase 3: Attribution Fields
-    const attributionFields = ["Lead Status", "Lead Activity Recent", "Lead Category"];
-    const missingAttribution = validateColumns(rows, attributionFields, spellings);
+    const attributionFields = ["lead status", "lead activity recent", "lead category"];
+    const missingAttribution = validateColumns(normalizedRows, attributionFields);
     if (missingAttribution.length) {
       missingAttribution.forEach(field => {
-        rows.forEach(row => {
-          if (field === "Lead Status") row["Lead Status"] = "Open";
+        normalizedRows.forEach(row => {
+          if (field === "lead status") row["lead status"] = "open";
           else row[field] = prompt(`Enter value for ${field}:`);
         });
       });
@@ -94,12 +92,11 @@ document.getElementById("processFile").addEventListener("click", () => {
     output.innerHTML += "<p>File processed successfully!</p>";
   }
   
-  function validateColumns(rows, fields, spellings) {
+  function validateColumns(rows, fields) {
     const missingFields = [];
   
     fields.forEach(field => {
-      const alternatives = spellings[field] || [field];
-      const found = rows.some(row => alternatives.some(alt => alt in row));
+      const found = rows.some(row => field in row);
       if (!found) missingFields.push(field);
     });
   
