@@ -12,12 +12,12 @@ document.getElementById("processFile").addEventListener("click", () => {
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
       const rows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
   
-      validateFile(rows);
+      processFile(rows);
     };
     reader.readAsArrayBuffer(fileInput);
   });
   
-  function validateFile(rows) {
+  function processFile(rows) {
     const output = document.getElementById("output");
     output.innerHTML = "";
   
@@ -37,51 +37,57 @@ document.getElementById("processFile").addEventListener("click", () => {
     const fieldMappings = {
       "first name": [
         "first name", "firstname", "first-name", "firsname", "vorname", "nombre", "fornafn", "prénom",
-        "primernombre", "vornam", "förnamn", "förstanamn"
+        "primernombre", "vornam", "förnamn", "förstanamn", "primeiro nome", "primeironome", "prenom",
+        "förnamn", "nome", "given name", "given-name", "givenname", "prenom"
       ],
       "last name": [
         "last name", "lastname", "last-name", "surname", "sur name", "nachname", "apellido", "eftirnafn",
-        "nachnam", "efternamn", "sobrenome", "nomdefamille"
+        "sobrenome", "nomdefamille", "efternamn", "sobrenome", "family name", "familyname", "famname",
+        "apellido paterno", "nomdefamille", "familiya", "cognome"
       ],
       "email": [
         "email", "e-mail", "email address", "email-address", "correo electrónico", "correo", "eadresse",
-        "emailadress", "netfang", "mel", "courriel", "emial", "emal", "mail", "mailadresse", "mailaddress"
+        "emailadress", "netfang", "mel", "courriel", "emial", "emal", "mail", "mailadresse", "mailaddress",
+        "email-id", "id email", "email id", "eaddress", "correo electronico"
       ],
       "company": [
         "company", "firm", "firma", "compañía", "fyrirtæki", "corporation", "enterprise", "sociedad",
-        "societe", "unternehmen", "geschäft", "org", "organisation", "organization"
+        "societe", "unternehmen", "geschäft", "org", "organisation", "organization", "business",
+        "business name", "nombre de empresa", "raison sociale", "organización", "firma"
       ],
       "assign to": [
         "assign to", "assign-to", "assignto", "zuweisen", "asignar", "úthluta", "zuordnung", "asignación",
-        "allouer", "zugewiesen", "asignado", "destinatario", "recipient"
+        "allouer", "zugewiesen", "asignado", "destinatario", "recipient", "owner", "assignment", "allocated to"
       ],
       "country": [
         "country", "land", "país", "landið", "nation", "patria", "pays", "staat", "nazione", "paese",
-        "ország", "országok"
+        "ország", "országok", "country name", "país natal", "heimatland", "estado"
       ],
       "phone": [
         "phone", "phone number", "phone-number", "telephone", "tel", "téléphone", "telefone", "telefonnummer",
-        "número de teléfono", "sími", "teléfono", "telefon", "mobile", "mobiltelefon"
+        "número de teléfono", "sími", "teléfono", "telefon", "mobile", "mobiltelefon", "cellphone", "cell",
+        "mobile number", "número móvil"
       ],
       "industry": [
         "industry", "branche", "indústria", "industrie", "industria", "grein", "szektor", "secteur",
-        "setor", "sektor"
+        "setor", "sektor", "line of work", "sector industrial", "branch"
       ],
       "job title": [
         "job title", "jobtitle", "position", "job", "role", "puesto", "cargo", "profession", "beruf",
-        "título de trabajo", "job designation", "arbeitsplatz", "funktion", "titel"
+        "título de trabajo", "job designation", "arbeitsplatz", "funktion", "titel", "job position",
+        "jobname", "work title", "employment title"
       ],
       "lead status": [
         "lead status", "lead_status", "status", "status del lead", "zustand des leads", "estado del lead",
-        "statut du lead", "staða leiðar", "lead stato", "estado do lead"
+        "statut du lead", "staða leiðar", "lead stato", "estado do lead", "lead state", "estado de contacto"
       ],
       "lead activity recent": [
         "lead activity recent", "recent activity", "actividad reciente", "letzte aktivität", "aktivität",
-        "activités récentes", "atividade recente", "nýleg virkni", "aktivitet"
+        "activités récentes", "atividade recente", "nýleg virkni", "aktivitet", "latest activity"
       ],
       "lead category": [
         "lead category", "category", "categorie", "kategorie", "catégorie", "kategorija", "kategória",
-        "categorie di lead", "categoria"
+        "categorie di lead", "categoria", "lead type", "tipo de lead"
       ]
     };
   
@@ -122,26 +128,16 @@ document.getElementById("processFile").addEventListener("click", () => {
       return;
     }
   
-    // Phase 2: Optional Fields Validation
-    const optionalFields = ["phone", "industry", "job title"];
-    const missingOptional = validateColumns(normalizedRows, optionalFields, fieldMappings);
-    if (missingOptional.length) {
-      output.innerHTML += `<p>Optional fields missing: ${missingOptional.join(", ")}. Follow-up might be harder.</p>`;
-    }
+    // Ensure "Lead Status" is set to "Open" if present
+    normalizedRows.forEach(row => {
+      if (row["lead status"] && row["lead status"].toLowerCase() === "open") {
+        row["lead status"] = "Open";
+      }
+    });
   
-    // Phase 3: Attribution Fields Validation
-    const attributionFields = ["lead status", "lead activity recent", "lead category"];
-    const missingAttribution = validateColumns(normalizedRows, attributionFields, fieldMappings);
-    if (missingAttribution.length) {
-      missingAttribution.forEach(field => {
-        normalizedRows.forEach(row => {
-          if (field === "lead status") row["lead status"] = "open";
-          else row[field] = prompt(`Enter value for ${field}:`);
-        });
-      });
-    }
-  
-    output.innerHTML += "<p>File processed successfully!</p>";
+    // Export the updated rows
+    exportToCSV(normalizedRows, "Updated_List.csv");
+    output.innerHTML += "<p>File processed successfully! The updated file has been downloaded.</p>";
   }
   
   function validateColumns(rows, fields, fieldMappings) {
@@ -156,4 +152,25 @@ document.getElementById("processFile").addEventListener("click", () => {
     });
   
     return missingFields;
+  }
+  
+  function exportToCSV(rows, filename) {
+    const csvContent = [
+      Object.keys(rows[0]).join(","), // Header row
+      ...rows.map(row =>
+        Object.values(row)
+          .map(value => (typeof value === "string" ? `"${value.replace(/"/g, '""')}"` : value))
+          .join(",")
+      )
+    ].join("\n");
+  
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    link.style.display = "none";
+  
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
