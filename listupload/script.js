@@ -27,19 +27,23 @@ document.getElementById("processFile").addEventListener("click", () => {
     }
   
     // Phase 1: Basic Fields
-    const requiredFields = ["First Name", "Last Name", "Email", "Company", "Assign To"];
-    const optionalFields = ["Phone", "Industry", "Job Title"];
-    const attributionFields = ["Lead Status", "Lead Activity Recent", "Lead Category"];
-  
+    const requiredFields = ['First Name', 'Last Name', 'Email', 'Company', 'Assign To', 'Country'];
     const spellings = {
-      "First Name": ["FirstName", "First Name", "Vorname", "Nombre", "Fornafn"],
-      "Last Name": ["LastName", "Last Name", "Nachname", "Apellido", "Eftirnafn"],
-      "Email": ["Email", "E-Mail", "Correo", "Netfang", "Email address", "Email Address"],
+      "First Name": ["First Name", "FirstName", "Vorname", "Nombre", "Fornafn"],
+      "Last Name": ["Last Name", "LastName", "Nachname", "Apellido", "Eftirnafn"],
+      "Email": ["Email", "email", "email "],
       "Company": ["Company", "Firma", "Compañía", "Fyrirtæki"],
-      "Assign To": ["Assign To", "Zuweisen", "Asignar", "Úthluta"]
+      "Assign To": ["Assign To", "AssignTo", "Zuweisen", "Asignar", "Úthluta"],
+      "Country": ["Country", "Land", "País", "Landið"]
     };
   
     const missingBasic = validateColumns(rows, requiredFields, spellings);
+  
+    // "Country" can be used as a fallback for "Assign To"
+    if (missingBasic.includes("Assign To") && !missingBasic.includes("Country")) {
+      missingBasic.splice(missingBasic.indexOf("Assign To"), 1);
+    }
+  
     if (missingBasic.length) {
       output.innerHTML += `<p>Missing basic fields: ${missingBasic.join(", ")}</p>`;
       return;
@@ -62,19 +66,21 @@ document.getElementById("processFile").addEventListener("click", () => {
       }
     }
   
-    // Validate email domain
+    // Validate email domain for "Assign To"
     if (!rows.every(row => row["Assign To"].endsWith("@calabrio.com"))) {
       output.innerHTML += "<p>Assign To must be an email ending in @calabrio.com.</p>";
       return;
     }
   
     // Phase 2: Optional Fields
+    const optionalFields = ["Phone", "Industry", "Job Title"];
     const missingOptional = validateColumns(rows, optionalFields, spellings);
     if (missingOptional.length) {
       output.innerHTML += `<p>Optional fields missing: ${missingOptional.join(", ")}. Follow-up might be harder.</p>`;
     }
   
     // Phase 3: Attribution Fields
+    const attributionFields = ["Lead Status", "Lead Activity Recent", "Lead Category"];
     const missingAttribution = validateColumns(rows, attributionFields, spellings);
     if (missingAttribution.length) {
       missingAttribution.forEach(field => {
