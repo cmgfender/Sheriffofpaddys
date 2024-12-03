@@ -26,18 +26,70 @@ document.getElementById("processFile").addEventListener("click", () => {
       return;
     }
   
-    // Normalize column names to lowercase and trimmed
+    // Normalize column names: Trim and convert to lowercase
     const normalizedRows = rows.map(row =>
       Object.fromEntries(
         Object.entries(row).map(([key, value]) => [key.trim().toLowerCase(), value])
       )
     );
   
-    // Phase 1: Basic Fields
-    const requiredFields = ['first name', 'last name', 'email', 'company', 'assign to', 'country'];
-    const missingBasic = validateColumns(normalizedRows, requiredFields);
+    // Expanded field mappings
+    const fieldMappings = {
+      "first name": [
+        "first name", "firstname", "first-name", "firsname", "vorname", "nombre", "fornafn", "prénom",
+        "primernombre", "vornam", "förnamn", "förstanamn"
+      ],
+      "last name": [
+        "last name", "lastname", "last-name", "surname", "sur name", "nachname", "apellido", "eftirnafn",
+        "nachnam", "efternamn", "sobrenome", "nomdefamille"
+      ],
+      "email": [
+        "email", "e-mail", "email address", "email-address", "correo electrónico", "correo", "eadresse",
+        "emailadress", "netfang", "mel", "courriel", "emial", "emal", "mail", "mailadresse", "mailaddress"
+      ],
+      "company": [
+        "company", "firm", "firma", "compañía", "fyrirtæki", "corporation", "enterprise", "sociedad",
+        "societe", "unternehmen", "geschäft", "org", "organisation", "organization"
+      ],
+      "assign to": [
+        "assign to", "assign-to", "assignto", "zuweisen", "asignar", "úthluta", "zuordnung", "asignación",
+        "allouer", "zugewiesen", "asignado", "destinatario", "recipient"
+      ],
+      "country": [
+        "country", "land", "país", "landið", "nation", "patria", "pays", "staat", "nazione", "paese",
+        "ország", "országok"
+      ],
+      "phone": [
+        "phone", "phone number", "phone-number", "telephone", "tel", "téléphone", "telefone", "telefonnummer",
+        "número de teléfono", "sími", "teléfono", "telefon", "mobile", "mobiltelefon"
+      ],
+      "industry": [
+        "industry", "branche", "indústria", "industrie", "industria", "grein", "szektor", "secteur",
+        "setor", "sektor"
+      ],
+      "job title": [
+        "job title", "jobtitle", "position", "job", "role", "puesto", "cargo", "profession", "beruf",
+        "título de trabajo", "job designation", "arbeitsplatz", "funktion", "titel"
+      ],
+      "lead status": [
+        "lead status", "lead_status", "status", "status del lead", "zustand des leads", "estado del lead",
+        "statut du lead", "staða leiðar", "lead stato", "estado do lead"
+      ],
+      "lead activity recent": [
+        "lead activity recent", "recent activity", "actividad reciente", "letzte aktivität", "aktivität",
+        "activités récentes", "atividade recente", "nýleg virkni", "aktivitet"
+      ],
+      "lead category": [
+        "lead category", "category", "categorie", "kategorie", "catégorie", "kategorija", "kategória",
+        "categorie di lead", "categoria"
+      ]
+    };
   
-    // Handle "Country" as a fallback for "Assign To"
+    // Phase 1: Basic Fields Validation
+    const requiredFields = Object.keys(fieldMappings);
+    const missingBasic = validateColumns(normalizedRows, requiredFields, fieldMappings);
+  
+    // Handle "Assign To" fallback to "Country"
     if (missingBasic.includes("assign to") && !missingBasic.includes("country")) {
       missingBasic.splice(missingBasic.indexOf("assign to"), 1);
     }
@@ -64,22 +116,22 @@ document.getElementById("processFile").addEventListener("click", () => {
       }
     }
   
-    // Validate email domain for "Assign To"
+    // Validate "Assign To" email domains
     if (!normalizedRows.every(row => row["assign to"]?.endsWith("@calabrio.com"))) {
       output.innerHTML += "<p>Assign To must be an email ending in @calabrio.com.</p>";
       return;
     }
   
-    // Phase 2: Optional Fields
+    // Phase 2: Optional Fields Validation
     const optionalFields = ["phone", "industry", "job title"];
-    const missingOptional = validateColumns(normalizedRows, optionalFields);
+    const missingOptional = validateColumns(normalizedRows, optionalFields, fieldMappings);
     if (missingOptional.length) {
       output.innerHTML += `<p>Optional fields missing: ${missingOptional.join(", ")}. Follow-up might be harder.</p>`;
     }
   
-    // Phase 3: Attribution Fields
+    // Phase 3: Attribution Fields Validation
     const attributionFields = ["lead status", "lead activity recent", "lead category"];
-    const missingAttribution = validateColumns(normalizedRows, attributionFields);
+    const missingAttribution = validateColumns(normalizedRows, attributionFields, fieldMappings);
     if (missingAttribution.length) {
       missingAttribution.forEach(field => {
         normalizedRows.forEach(row => {
@@ -92,11 +144,14 @@ document.getElementById("processFile").addEventListener("click", () => {
     output.innerHTML += "<p>File processed successfully!</p>";
   }
   
-  function validateColumns(rows, fields) {
+  function validateColumns(rows, fields, fieldMappings) {
     const missingFields = [];
   
     fields.forEach(field => {
-      const found = rows.some(row => field in row);
+      const alternatives = fieldMappings[field] || [field];
+      const found = rows.some(row =>
+        alternatives.some(alt => alt.toLowerCase() in row)
+      );
       if (!found) missingFields.push(field);
     });
   
