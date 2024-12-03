@@ -2,34 +2,87 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <title>Your Portfolio</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Charles Glass Portfolio</title>
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <!-- Link to the CSS file -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 </head>
 <body>
-    <header>
-        <div class="navbar">
-            <h1 class="logo">Charles Glass</h1>
-            <nav>
-                <a href="#about">About</a>
-                <a href="#skills">Skills</a>
-                <a href="#interests">What I'm Into</a>
-                <a href="#contact">Contact</a>
-            </nav>
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">Your Name</div>
+        <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#work">Projects</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <div class="burger">
+            <div class="line1"></div>
+            <div class="line2"></div>
+            <div class="line3"></div>
         </div>
-        <div class="hero">
-            <h1>Its workingn</h1>
-            <p>working working working</p>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>Welcome to My Portfolio</h1>
+            <p>Discover my work and projects.</p>
+            <a href="#work" class="btn">View Projects</a>
         </div>
-    </header>
-    
-    
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <h2>About Me</h2>
+        <p>Briefly introduce yourself and your background.</p>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="work" class="work">
+        <h2>My Projects</h2>
+        <div class="work-gallery">
+            <!-- Project 1 -->
+            <div class="work-item">
+                <img src="project1.jpg" alt="Project 1">
+                <div class="work-item-info">
+                    <h3>Project Title</h3>
+                    <p>Short description of the project.</p>
+                </div>
+            </div>
+            <!-- Project 2 -->
+            <div class="work-item">
+                <img src="project2.jpg" alt="Project 2">
+                <div class="work-item-info">
+                    <h3>Project Title</h3>
+                    <p>Short description of the project.</p>
+                </div>
+            </div>
+            <!-- Add more project items as needed -->
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <h2>Contact Me</h2>
+        <p>I'm open to opportunities and collaborations.</p>
+        <!-- Contact form or details can go here -->
+    </section>
+
+    <!-- Footer -->
     <footer>
-        <div class="footer-content">
-            <p>&copy; 2024 Charles Glass. Designed with inspiration and simplicity in mind.</p>
+        <p>&copy; 2023 Your Name</p>
+        <div class="social-links">
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+            <!-- Add more social icons as needed -->
         </div>
     </footer>
-    <script src="scripts.js"></script>
+
+    <!-- Link to the JavaScript file -->
+    <script src="script.js"></script>
 </body>
 </html>
