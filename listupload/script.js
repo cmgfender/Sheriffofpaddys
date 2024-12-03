@@ -34,7 +34,7 @@ document.getElementById("processFile").addEventListener("click", () => {
     const spellings = {
       "First Name": ["FirstName", "First Name", "Vorname", "Nombre", "Fornafn"],
       "Last Name": ["LastName", "Last Name", "Nachname", "Apellido", "Eftirnafn"],
-      "Email": ["Email", "E-Mail", "Correo", "Netfang", "Email address"],
+      "Email": ["Email", "E-Mail", "Correo", "Netfang", "Email address", "Email Address"],
       "Company": ["Company", "Firma", "Compañía", "Fyrirtæki"],
       "Assign To": ["Assign To", "Zuweisen", "Asignar", "Úthluta"]
     };
