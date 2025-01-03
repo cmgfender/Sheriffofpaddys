@@ -66,6 +66,23 @@ body, html {
   background-color: #45a049;
 }
 
+/* Enhanced Seasonal Backgrounds */
+body.spring {
+  background: linear-gradient(to bottom, #e3ffe7, #d9e7ff);
+}
+
+body.summer {
+  background: linear-gradient(to bottom, #ffe29f, #ffa99f);
+}
+
+body.fall {
+  background: linear-gradient(to bottom, #ff9a9e, #fecfef);
+}
+
+body.winter {
+  background: linear-gradient(to bottom, #a1c4fd, #c2e9fb);
+}
+
 /* Holiday Themes */
 body.christmas-theme {
   background: linear-gradient(to bottom, #ffecd2, #fcb69f);
@@ -87,23 +104,47 @@ body.independence-theme {
   background: linear-gradient(to bottom, #3b82f6, #ef4444);
 }
 
-/* Holiday Effects */
-.bat, .heart, .firework {
+/* Effects */
+.effect {
   position: absolute;
   animation: float 5s linear infinite;
 }
 
-.bat {
+.snowflake {
+  width: 10px;
+  height: 10px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.leaf {
   width: 20px;
   height: 20px;
+  background: #a0522d;
+  border-radius: 50%;
+}
+
+.light-flare {
+  width: 15px;
+  height: 15px;
+  background: yellow;
+  border-radius: 50%;
+  box-shadow: 0 0 15px rgba(255, 255, 0, 0.5);
+}
+
+.bat {
+  width: 20px;
+  height: 10px;
   background: black;
+  clip-path: polygon(0 100%, 25% 0, 50% 100%, 75% 0, 100% 100%);
 }
 
 .heart {
   width: 15px;
   height: 15px;
   background: red;
-  transform: rotate(45deg);
+  clip-path: polygon(50% 0%, 100% 40%, 50% 100%, 0% 40%);
 }
 
 .firework {
@@ -111,14 +152,15 @@ body.independence-theme {
   height: 10px;
   background: yellow;
   border-radius: 50%;
+  box-shadow: 0 0 10px rgba(255, 255, 0, 0.8);
 }
 
 /* Animations */
 @keyframes float {
-  from {
+  0% {
     transform: translateY(-10%);
   }
-  to {
+  100% {
     transform: translateY(110%);
   }
 }
