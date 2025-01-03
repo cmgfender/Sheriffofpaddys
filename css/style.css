@@ -66,37 +66,21 @@ body, html {
   background-color: #45a049;
 }
 
-/* Enhanced Seasonal Backgrounds */
-body.late-winter {
-  background: linear-gradient(to bottom, #a1c4fd, #c2e9fb);
-}
-
-body.early-spring {
-  background: linear-gradient(to bottom, #e3ffe7, #d9e7ff);
-}
-
+/* Seasonal Backgrounds */
 body.spring {
-  background: linear-gradient(to bottom, #d4fc79, #96e6a1);
+  background: linear-gradient(to bottom, #e3ffe7, #d9e7ff);
 }
 
 body.summer {
   background: linear-gradient(to bottom, #ffe29f, #ffa99f);
 }
 
-body.late-summer {
+body.fall {
   background: linear-gradient(to bottom, #ff9a9e, #fecfef);
 }
 
-body.fall {
-  background: linear-gradient(to bottom, #ff6f61, #fecc9c);
-}
-
-body.late-fall {
-  background: linear-gradient(to bottom, #d8a7b1, #805d93);
-}
-
-body.early-winter {
-  background: linear-gradient(to bottom, #89cff0, #dce7f9);
+body.winter {
+  background: linear-gradient(to bottom, #a1c4fd, #c2e9fb);
 }
 
 /* Holiday Themes */
@@ -108,22 +92,11 @@ body.halloween-theme {
   background: linear-gradient(to bottom, #3f0d12, #a71d31);
 }
 
-body.thanksgiving-theme {
-  background: linear-gradient(to bottom, #ff9a8b, #ff6a88);
-}
-
-body.valentines-theme {
-  background: linear-gradient(to bottom, #fbc2eb, #a6c1ee);
-}
-
-body.independence-theme {
-  background: linear-gradient(to bottom, #3b82f6, #ef4444);
-}
-
 /* Effects */
 .effect {
   position: absolute;
-  animation: float 5s linear infinite;
+  animation: fall 8s linear infinite, drift 4s ease-in-out infinite alternate;
+  opacity: 0.8;
 }
 
 .snowflake {
@@ -131,7 +104,7 @@ body.independence-theme {
   height: 10px;
   background: white;
   border-radius: 50%;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
 }
 
 .leaf {
@@ -172,11 +145,20 @@ body.independence-theme {
 }
 
 /* Animations */
-@keyframes float {
-  0% {
+@keyframes fall {
+  from {
     transform: translateY(-10%);
   }
-  100% {
+  to {
     transform: translateY(110%);
+  }
+}
+
+@keyframes drift {
+  from {
+    transform: translateX(-10px);
+  }
+  to {
+    transform: translateX(10px);
   }
 }
