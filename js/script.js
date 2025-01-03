@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function createEffects(effectClass, count) {
     for (let i = 0; i < count; i++) {
       const effect = document.createElement('div');
-      effect.className = effectClass;
+      effect.className = `effect ${effectClass}`;
       effect.style.left = `${Math.random() * 100}%`;
       effect.style.animationDuration = `${Math.random() * 3 + 2}s`;
       effectsContainer.appendChild(effect);
