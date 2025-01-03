@@ -50,8 +50,20 @@ document.addEventListener('DOMContentLoaded', () => {
       const effect = document.createElement('div');
       effect.className = `effect ${effectClass}`;
       effect.style.left = `${Math.random() * 100}%`;
-      effect.style.animationDuration = `${Math.random() * 5 + 3}s`;
+      effect.style.animationDuration = `${Math.random() * 5 + 5}s`;
       effectsContainer.appendChild(effect);
     }
   }
+
+  // Handle login form
+  const loginForm = document.getElementById('login-form');
+  loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const password = document.getElementById('password').value;
+    if (password === 'Glassmire') {
+      window.location.href = '/tools';
+    } else {
+      alert('Incorrect password. Please try again.');
+    }
+  });
 });
