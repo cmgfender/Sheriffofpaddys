@@ -9,13 +9,23 @@ document.addEventListener('DOMContentLoaded', () => {
   let timeOfDay = '';
   let holiday = '';
 
-  // Determine the season
-  if (month >= 3 && month <= 5) {
+  // Determine the season with finer granularity
+  if ((month === 2 && day >= 15) || (month === 3 && day <= 20)) {
+    season = 'late-winter';
+  } else if ((month === 3 && day >= 21) || (month === 4 && day <= 10)) {
+    season = 'early-spring';
+  } else if (month >= 4 && month <= 5) {
     season = 'spring';
-  } else if (month >= 6 && month <= 8) {
+  } else if (month === 6 || (month === 7 && day <= 15)) {
     season = 'summer';
-  } else if (month >= 9 && month <= 11) {
+  } else if (month === 7 || (month === 8 && day <= 15)) {
+    season = 'late-summer';
+  } else if (month === 9 || (month === 10 && day <= 20)) {
     season = 'fall';
+  } else if (month === 10 || (month === 11 && day <= 10)) {
+    season = 'late-fall';
+  } else if (month === 11 || (month === 12 && day <= 15)) {
+    season = 'early-winter';
   } else {
     season = 'winter';
   }
@@ -78,13 +88,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Seasonal messages
   const seasonalMessages = {
-    spring: 'Spring is in the air! Enjoy the blooming flowers and fresh breeze.',
-    summer: 'Summer is here! Soak up the sun and enjoy the warmth.',
-    fall: 'Autumn leaves are falling. Cozy up and enjoy the crisp air.',
-    winter: 'Winter has arrived. Stay warm and enjoy the festive spirit.'
+    'late-winter': 'Winter is ending. Stay warm as spring approaches.',
+    'early-spring': 'Spring is awakening! The air is fresh with possibility.',
+    spring: 'Spring is in full bloom. Enjoy the vibrant colors and energy.',
+    summer: 'Summer is here! Time for sunshine and relaxation.',
+    'late-summer': 'Late summer days are perfect for golden sunsets.',
+    fall: 'The leaves are turning. Enjoy the crisp autumn air.',
+    'late-fall': 'The final days of fall are cozy and colorful.',
+    'early-winter': 'Winter is creeping in. Stay warm and enjoy the chill.',
+    winter: 'Winter has arrived. Cozy up and enjoy the festive spirit.'
   };
 
-  // Set the message
+  // Set the message (priority: holiday > time > season)
   let message = holiday
     ? holidayMessages[holiday]
     : `${timeMessages[timeOfDay]} ${seasonalMessages[season]}`;
@@ -98,11 +113,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function addSeasonalEffects(season) {
-    if (season === 'winter') {
+    if (season === 'winter' || season === 'late-winter' || season === 'early-winter') {
       createEffects('snowflake', 50);
-    } else if (season === 'fall') {
+    } else if (season.includes('fall')) {
       createEffects('leaf', 30);
-    } else if (season === 'summer') {
+    } else if (season.includes('summer')) {
       createEffects('light-flare', 20);
     }
   }
