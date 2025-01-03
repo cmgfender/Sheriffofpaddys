@@ -67,20 +67,36 @@ body, html {
 }
 
 /* Enhanced Seasonal Backgrounds */
-body.spring {
+body.late-winter {
+  background: linear-gradient(to bottom, #a1c4fd, #c2e9fb);
+}
+
+body.early-spring {
   background: linear-gradient(to bottom, #e3ffe7, #d9e7ff);
+}
+
+body.spring {
+  background: linear-gradient(to bottom, #d4fc79, #96e6a1);
 }
 
 body.summer {
   background: linear-gradient(to bottom, #ffe29f, #ffa99f);
 }
 
-body.fall {
+body.late-summer {
   background: linear-gradient(to bottom, #ff9a9e, #fecfef);
 }
 
-body.winter {
-  background: linear-gradient(to bottom, #a1c4fd, #c2e9fb);
+body.fall {
+  background: linear-gradient(to bottom, #ff6f61, #fecc9c);
+}
+
+body.late-fall {
+  background: linear-gradient(to bottom, #d8a7b1, #805d93);
+}
+
+body.early-winter {
+  background: linear-gradient(to bottom, #89cff0, #dce7f9);
 }
 
 /* Holiday Themes */
