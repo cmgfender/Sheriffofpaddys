@@ -95,7 +95,7 @@ body.halloween-theme {
 /* Effects */
 .effect {
   position: absolute;
-  animation: fall 8s linear infinite, drift 4s ease-in-out infinite alternate;
+  animation: fall 10s linear infinite, sway 4s ease-in-out infinite alternate;
   opacity: 0.8;
 }
 
@@ -112,6 +112,8 @@ body.halloween-theme {
   height: 20px;
   background: #a0522d;
   border-radius: 50%;
+  transform: rotate(0deg);
+  animation: fall 10s linear infinite, sway 4s ease-in-out infinite alternate, spin 6s linear infinite;
 }
 
 .light-flare {
@@ -120,28 +122,6 @@ body.halloween-theme {
   background: yellow;
   border-radius: 50%;
   box-shadow: 0 0 15px rgba(255, 255, 0, 0.5);
-}
-
-.bat {
-  width: 20px;
-  height: 10px;
-  background: black;
-  clip-path: polygon(0 100%, 25% 0, 50% 100%, 75% 0, 100% 100%);
-}
-
-.heart {
-  width: 15px;
-  height: 15px;
-  background: red;
-  clip-path: polygon(50% 0%, 100% 40%, 50% 100%, 0% 40%);
-}
-
-.firework {
-  width: 10px;
-  height: 10px;
-  background: yellow;
-  border-radius: 50%;
-  box-shadow: 0 0 10px rgba(255, 255, 0, 0.8);
 }
 
 /* Animations */
@@ -154,11 +134,20 @@ body.halloween-theme {
   }
 }
 
-@keyframes drift {
+@keyframes sway {
   from {
-    transform: translateX(-10px);
+    transform: translateX(-20px);
   }
   to {
-    transform: translateX(10px);
+    transform: translateX(20px);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
