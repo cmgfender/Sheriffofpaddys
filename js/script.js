@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const month = new Date().getMonth() + 1; // JavaScript months are 0-based
-  const day = new Date().getDate();
   const effectsContainer = document.getElementById('effects-container');
+  const month = new Date().getMonth() + 1;
+  const day = new Date().getDate();
   let season = '';
   let holiday = '';
 
@@ -20,7 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
     season = 'spring';
   }
 
-  // Apply seasonal or holiday-specific effects
   if (holiday) {
     addHolidayEffects(holiday);
   } else {
@@ -29,17 +28,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function addSeasonalEffects(season) {
     if (season === 'winter') {
-      createEffects('snowflake', 50);
+      createEffects('snowflake', 30); // Reduced count for mobile
     } else if (season === 'fall') {
-      createEffects('leaf', 30);
+      createEffects('leaf', 20);
     } else if (season === 'summer') {
-      createEffects('light-flare', 20);
+      createEffects('light-flare', 15);
     }
   }
 
   function addHolidayEffects(holiday) {
     if (holiday === 'christmas') {
-      createEffects('snowflake', 70);
+      createEffects('snowflake', 50);
     } else if (holiday === 'halloween') {
       createEffects('bat', 15);
     }
@@ -49,22 +48,9 @@ document.addEventListener('DOMContentLoaded', () => {
     for (let i = 0; i < count; i++) {
       const effect = document.createElement('div');
       effect.className = `effect ${effectClass}`;
-      effect.style.left = `${Math.random() * 100}%`;
+      effect.style.left = `${Math.random() * 100}vw`;
       effect.style.animationDelay = `${Math.random() * 5}s`;
-      effect.style.animationDuration = `${Math.random() * 5 + 5}s`;
       effectsContainer.appendChild(effect);
     }
   }
-
-  // Handle login form
-  const loginForm = document.getElementById('login-form');
-  loginForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const password = document.getElementById('password').value;
-    if (password === 'Glassmire') {
-      window.location.href = '/tools';
-    } else {
-      alert('Incorrect password. Please try again.');
-    }
-  });
 });
