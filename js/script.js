@@ -50,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const effect = document.createElement('div');
       effect.className = `effect ${effectClass}`;
       effect.style.left = `${Math.random() * 100}%`;
+      effect.style.animationDelay = `${Math.random() * 5}s`;
       effect.style.animationDuration = `${Math.random() * 5 + 5}s`;
       effectsContainer.appendChild(effect);
     }
