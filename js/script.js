@@ -1,7 +1,10 @@
 /*****************************************************
  * MAIN ENTRY
  *****************************************************/
-window.addEventListener("load", () => {
+window.addEventListener("DOMContentLoaded", () => {
+  // Log for debugging
+  console.log("DOM fully loaded. About to run welcome page logic.");
+
   const holiday = checkHoliday();
   const timeOfDay = checkTimeOfDay();
   const season = checkSeason();
@@ -9,11 +12,13 @@ window.addEventListener("load", () => {
   // Apply backgrounds & messages by priority
   applyTheme(holiday, timeOfDay, season);
 
-  // Generate any special falling effects
+  // Generate special falling effects
   createFallingEffects(holiday, season);
 
   // Set up the login
   setupLogin();
+
+  console.log("Script finished initializing.");
 });
 
 /*****************************************************
@@ -56,6 +61,7 @@ function checkHoliday() {
  *****************************************************/
 function checkTimeOfDay() {
   const hour = new Date().getHours();
+  console.log("Current hour:", hour); // for debugging
 
   if (hour >= 6 && hour < 11) {
     return "morning";
@@ -77,6 +83,8 @@ function checkTimeOfDay() {
  *****************************************************/
 function checkSeason() {
   const month = new Date().getMonth() + 1;
+  console.log("Current month:", month); // for debugging
+
   if (month >= 3 && month < 6) {
     return "spring";
   } else if (month >= 6 && month < 9) {
@@ -94,6 +102,12 @@ function checkSeason() {
 function applyTheme(holiday, timeOfDay, season) {
   const body = document.body;
   const welcomeMessage = document.getElementById("welcome-message");
+
+  // If element is missing, bail out
+  if (!welcomeMessage) {
+    console.warn("No element with ID 'welcome-message' found.");
+    return;
+  }
 
   // Priority 1: HOLIDAY
   if (holiday) {
@@ -169,7 +183,7 @@ function applyTheme(holiday, timeOfDay, season) {
     case "fall":
       body.classList.add("body-fall");
       break;
-    default: // winter
+    default:
       body.classList.add("body-winter");
   }
 }
@@ -178,7 +192,6 @@ function applyTheme(holiday, timeOfDay, season) {
  * CREATE FALLING EFFECTS
  *****************************************************/
 function createFallingEffects(holiday, season) {
-  // We'll set up intervals for recognized holiday/season effects
   if (holiday === "christmas" || season === "winter") {
     // Snowflakes
     startFallingEffect("snowflake", "❄", 800);
@@ -186,24 +199,20 @@ function createFallingEffects(holiday, season) {
     // Bats
     startFallingEffect("bat", "🦇", 1000);
   } else if (holiday === "newyear" || holiday === "july4") {
-    // Confetti (★) for celebration
+    // Confetti
     startFallingEffect("confetti", "★", 300);
   }
 }
 
-/**
- * Helper to create new falling objects at intervals.
- * @param {string} effectClass - e.g., 'snowflake', 'bat', 'confetti'
- * @param {string} symbol - e.g., '❄', '🦇', '★'
- * @param {number} interval - time in ms between creations (e.g., 800)
- */
 function startFallingEffect(effectClass, symbol, interval) {
+  console.log(`Starting falling effect: ${effectClass} at interval ${interval}ms`);
+
   const creationInterval = setInterval(() => {
     const effectEl = document.createElement("div");
     effectEl.classList.add("falling-object", effectClass);
     effectEl.innerText = symbol;
 
-    // For confetti, randomize color
+    // Randomize color for confetti
     if (effectClass === "confetti") {
       const colors = ["#f44336", "#e91e63", "#9c27b0", "#2196f3", "#4caf50", "#ffeb3b", "#ff9800"];
       const randomColor = colors[Math.floor(Math.random() * colors.length)];
@@ -227,11 +236,10 @@ function startFallingEffect(effectClass, symbol, interval) {
       effectEl.remove();
     });
 
-    // Append to container
     document.getElementById("falling-effects-container").appendChild(effectEl);
   }, interval);
 
-  // Optionally stop after a while (e.g., 30 seconds)
+  // Stop after 30s if desired
   // setTimeout(() => clearInterval(creationInterval), 30000);
 }
 
@@ -239,14 +247,27 @@ function startFallingEffect(effectClass, symbol, interval) {
  * LOGIN HANDLER
  *****************************************************/
 function setupLogin() {
+  console.log("Setting up login handler.");
+  
   const loginForm = document.getElementById("loginForm");
+  if (!loginForm) {
+    console.warn("No loginForm found in DOM.");
+    return;
+  }
+
   loginForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const passwordInput = document.getElementById("passwordInput");
+    if (!passwordInput) {
+      alert("No password input found, cannot proceed.");
+      return;
+    }
+
     const password = passwordInput.value.trim();
 
+    // Validate password
     if (password === "Glassmire") {
-      // Redirect to tools page (replace with your real URL)
+      // Replace with your actual tools page
       window.location.href = "https://your-tools-page.example.com";
     } else {
       alert("Incorrect password. Please try again.");
