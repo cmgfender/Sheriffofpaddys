@@ -1,11 +1,6 @@
 /*****************************************************
  * MAIN ENTRY
  *****************************************************/
-/*
-  Using DOMContentLoaded + defer ensures the HTML is parsed
-  before this script runs. That way, getElementById calls
-  will actually find the elements.
-*/
 document.addEventListener("DOMContentLoaded", () => {
   console.log("DOM fully loaded, starting setup...");
 
@@ -66,10 +61,82 @@ function checkHoliday() {
 }
 
 /*****************************************************
+ * TIME-OF-DAY GREETINGS
+ * Each key has an array of possible messages.
+ * We'll pick one at random in checkTimeOfDay().
+ *****************************************************/
+const timeOfDayGreetings = {
+  morning: [
+    "Good Morning! Rise and shine!",
+    "Morning sunshine! Have a bright and productive day!",
+    "Top of the morning to you! Let’s make the most of it!",
+    "A fresh morning is a fresh start—go conquer!",
+    "Rise and grind! Wishing you a fantastic morning."
+  ],
+  lateMorning: [
+    "Late Morning! Keep that energy going!",
+    "Still morning, but the day is in full swing!",
+    "Time to power through this late morning!",
+    "Getting closer to midday—keep it rolling!"
+  ],
+  midday: [
+    "Good Midday! Stay focused and keep it up!",
+    "Midday is here—grab some lunch and recharge!",
+    "Hello, midday hustler! You’ve got this!",
+    "Lunchtime vibes—take a break and refuel!"
+  ],
+  earlyAfternoon: [
+    "Good Afternoon! Keep up the great work.",
+    "Early afternoon—perfect for a quick stretch!",
+    "The afternoon is young—keep pushing forward!",
+    "Fuel up with a snack and power on!"
+  ],
+  happyHour: [
+    "It's Happy Hour! Time to relax and enjoy!",
+    "Happy Hour is here—treat yourself!",
+    "Cheers to a well-deserved break!",
+    "Time to unwind—Happy Hour style!"
+  ],
+  dinnerTime: [
+    "Dinner Time! Treat yourself to a good meal.",
+    "It’s dinner time—bon appétit!",
+    "Nothing like a hearty dinner to wrap the day!",
+    "Hope you have something delicious planned tonight!"
+  ],
+  primeTime: [
+    "Prime Time! Sit back and enjoy the evening.",
+    "Evening prime time—perfect for your favorite show!",
+    "Kick back and relax—it’s prime time!",
+    "The night is still young—enjoy it!"
+  ],
+  night: [
+    "Good Night! Rest well and recharge.",
+    "Nighttime—time to wind down and reflect on the day.",
+    "Put your feet up and relax—another day done!",
+    "Time for some shut-eye! Sleep well."
+  ],
+  lateNight: [
+    "It's really late! Don’t forget to get some rest.",
+    "Late night hours—time to call it a day soon!",
+    "Burning the midnight oil? Take a quick break!",
+    "Night owl mode—just don’t forget to sleep eventually!"
+  ]
+};
+
+/*****************************************************
+ * PICK RANDOM MESSAGE FROM AN ARRAY
+ *****************************************************/
+function getRandomMessageFromArray(array) {
+  if (!array || !array.length) return null;
+  const randomIndex = Math.floor(Math.random() * array.length);
+  return array[randomIndex];
+}
+
+/*****************************************************
  * CHECK TIME OF DAY
- * Return strings like "morning", "midday", "afternoon", 
- * "evening", "night", or "lateNight". If no time is available,
- * return null for fallback.
+ * Return strings like:
+ *   "morning", "lateMorning", "midday", "earlyAfternoon",
+ *   "happyHour", "dinnerTime", "primeTime", "night", "lateNight"
  *****************************************************/
 function checkTimeOfDay() {
   const now = new Date();
@@ -81,12 +148,26 @@ function checkTimeOfDay() {
   const hour = now.getHours();
   console.log("Current hour:", hour);
 
-  if (hour >= 6 && hour < 11) return "morning";
-  if (hour >= 11 && hour < 14) return "midday";
-  if (hour >= 14 && hour < 18) return "afternoon";
-  if (hour >= 18 && hour < 22) return "evening";
-  if (hour >= 22 || hour < 2)  return "night";
-  return "lateNight";
+  // Adjust these ranges however you see fit!
+  //  5-10      = morning
+  //  10-12     = lateMorning
+  //  12-14     = midday
+  //  14-16     = earlyAfternoon
+  //  16-18     = happyHour
+  //  18-20     = dinnerTime
+  //  20-22     = primeTime
+  //  22-24     = night
+  //  0-5       = lateNight
+
+  if (hour >= 5 && hour < 10)  return "morning";
+  if (hour >= 10 && hour < 12) return "lateMorning";
+  if (hour >= 12 && hour < 14) return "midday";
+  if (hour >= 14 && hour < 16) return "earlyAfternoon";
+  if (hour >= 16 && hour < 18) return "happyHour";
+  if (hour >= 18 && hour < 20) return "dinnerTime";
+  if (hour >= 20 && hour < 22) return "primeTime";
+  if (hour >= 22 && hour < 24) return "night";
+  return "lateNight"; // 0 <= hour < 5
 }
 
 /*****************************************************
@@ -104,8 +185,8 @@ function checkSeason() {
   const month = now.getMonth() + 1;
   console.log("Current month:", month);
 
-  if (month >= 3 && month < 6) return "spring";
-  if (month >= 6 && month < 9) return "summer";
+  if (month >= 3 && month < 6)  return "spring";
+  if (month >= 6 && month < 9)  return "summer";
   if (month >= 9 && month < 12) return "fall";
   return "winter";
 }
@@ -127,9 +208,12 @@ function applyTheme(holiday, timeOfDay, season) {
   let finalMessage = "Hello! We hope you're having a wonderful day.";
 
   /***********************************************
-   * PRIORITY 1: HOLIDAY
+   * PRIORITY 1: HOLIDAY (single message or random)
    ***********************************************/
   if (holiday) {
+    // If you want multiple holiday messages, you can also define
+    // an object like holidayMessages[holiday] = ["msg1", "msg2", ...]
+    // For now, we just have single messages, but you can expand similarly.
     switch (holiday) {
       case "newyear":
         body.classList.add("body-newyear");
@@ -171,49 +255,40 @@ function applyTheme(holiday, timeOfDay, season) {
   }
 
   /***********************************************
-   * PRIORITY 2: TIME OF DAY
+   * PRIORITY 2: TIME OF DAY (randomized)
    ***********************************************/
-  // Only if there's no holiday or holiday is null
   if (timeOfDay) {
-    switch (timeOfDay) {
-      case "morning":
-        finalMessage = "Good Morning! Rise and shine!";
-        break;
-      case "midday":
-        finalMessage = "Good Midday! Keep the momentum going!";
-        break;
-      case "afternoon":
-        finalMessage = "Good Afternoon! Keep up the great work.";
-        break;
-      case "evening":
-        finalMessage = "Good Evening! Time to relax and unwind.";
-        break;
-      case "night":
-        finalMessage = "Good Night! Rest well and recharge.";
-        break;
-      case "lateNight":
-        finalMessage = "It's really late! Don’t forget to get some rest.";
-        break;
-      default:
-        // If we get something unexpected, use fallback
-        finalMessage = "Hello! We hope you're having a great day.";
+    // Grab a random greeting for the identified timeOfDay
+    const randomTimeMsg = getRandomMessageFromArray(timeOfDayGreetings[timeOfDay]);
+    if (randomTimeMsg) {
+      finalMessage = randomTimeMsg;
     }
   }
-  // Keep finalMessage for now, because we still want to set a seasonal background after.
 
   /***********************************************
-   * PRIORITY 3: SEASON
+   * PRIORITY 3: SEASON (background & optional extra note)
    ***********************************************/
-  if (season === "spring") {
-    body.classList.add("body-spring");
-  } else if (season === "summer") {
-    body.classList.add("body-summer");
-  } else if (season === "fall") {
-    body.classList.add("body-fall");
-  } else if (season === "winter") {
-    body.classList.add("body-winter");
+  if (season) {
+    switch (season) {
+      case "spring":
+        body.classList.add("body-spring");
+        // Optionally append something to the final message:
+        finalMessage += " Enjoy the blossoming flowers of Spring!";
+        break;
+      case "summer":
+        body.classList.add("body-summer");
+        finalMessage += " Stay cool and soak up the Summer sun!";
+        break;
+      case "fall":
+        body.classList.add("body-fall");
+        finalMessage += " Enjoy the crisp Fall air and colorful leaves!";
+        break;
+      case "winter":
+        body.classList.add("body-winter");
+        finalMessage += " Stay warm and cozy this Winter season!";
+        break;
+    }
   }
-  // If season is null or something unexpected, we leave the default background.
 
   welcomeMsgEl.textContent = finalMessage;
 }
@@ -222,7 +297,7 @@ function applyTheme(holiday, timeOfDay, season) {
  * CREATE FALLING EFFECTS
  *****************************************************/
 function createFallingEffects(holiday, season) {
-  // Simple logic: if we recognized a holiday or season, we run certain effects
+  // Simple logic: if we recognized a holiday or season, run certain effects
   if (holiday === "christmas" || season === "winter") {
     startFallingEffect("snowflake", "❄", 800);
   } else if (holiday === "halloween") {
@@ -278,7 +353,7 @@ function startFallingEffect(effectClass, symbol, intervalMs) {
     container.appendChild(el);
   }, intervalMs);
 
-  // Stop after 30 seconds if you like:
+  // Stop after 30 seconds if desired:
   // setTimeout(() => clearInterval(creationInterval), 30000);
 }
 
