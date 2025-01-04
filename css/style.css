@@ -1,169 +1,217 @@
-/* Base styles */
-body, html {
+/* ----------------------------------------------------
+   BASE & RESET
+----------------------------------------------------- */
+* {
   margin: 0;
   padding: 0;
-  width: 100%;
+  box-sizing: border-box;
+}
+
+html, body {
   height: 100%;
-  font-family: 'Arial', sans-serif;
+}
+
+/* Use a modern font (Poppins) if available */
+body {
+  font-family: 'Poppins', sans-serif;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  overflow: hidden;
+  justify-content: flex-start;
+  background: linear-gradient(135deg, #445, #778);
+  color: #fff;
+  overflow: hidden; /* hide scrollbars for falling effects */
   transition: background 0.5s ease;
 }
 
+/* ----------------------------------------------------
+   HERO SECTION
+----------------------------------------------------- */
 .hero {
+  width: 100%;
+  padding: 3rem 1rem 2rem;
   text-align: center;
-  z-index: 2;
-  position: relative;
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(4px);
 }
 
-.hero-text {
-  font-size: 4rem;
-  font-weight: bold;
-  color: white;
+.hero-title {
+  font-size: 2.5rem;
+  font-weight: 600;
   margin-bottom: 1rem;
-  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
 }
 
-.welcome-message {
-  font-size: 1.5rem;
-  color: #ffffff;
-  margin-bottom: 2rem;
-  text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+.hero-greeting {
+  font-size: 1.2rem;
+  font-weight: 400;
   font-style: italic;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* ----------------------------------------------------
+   LOGIN SECTION
+----------------------------------------------------- */
+.login-section {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.login-container {
+  margin-top: 2rem;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1.5rem 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 .login-form {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
 }
 
-.login-form input {
-  padding: 0.8rem 1rem;
+.login-label {
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.login-input {
+  padding: 0.5rem;
   margin-bottom: 1rem;
-  font-size: 1rem;
+  width: 220px;
   border: none;
-  border-radius: 5px;
-  width: 250px;
-  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  outline: none;
+  font-size: 1rem;
 }
 
-.login-form button {
-  padding: 0.8rem 1rem;
+.login-button {
+  padding: 0.5rem 1.5rem;
   font-size: 1rem;
+  background: #00acc1;
   border: none;
-  border-radius: 5px;
-  background-color: #4caf50;
-  color: white;
+  border-radius: 4px;
   cursor: pointer;
-  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
-  transition: background-color 0.3s ease;
+  color: #fff;
+  font-weight: 600;
 }
 
-.login-form button:hover {
-  background-color: #45a049;
+.login-button:hover {
+  background: #00838f;
 }
 
-/* Seasonal Backgrounds */
-body.spring {
-  background: linear-gradient(to bottom, #e3ffe7, #d9e7ff);
+/* ----------------------------------------------------
+   SEASONS & HOLIDAYS BACKGROUNDS
+----------------------------------------------------- */
+/* Seasons */
+.body-spring {
+  background: linear-gradient(135deg, #6bd1a2, #b2ffda);
+}
+.body-summer {
+  background: linear-gradient(135deg, #ffd54f, #ffb300);
+}
+.body-fall {
+  background: linear-gradient(135deg, #d84315, #bf360c);
+}
+.body-winter {
+  background: linear-gradient(135deg, #90caf9, #42a5f5);
 }
 
-body.summer {
-  background: linear-gradient(to bottom, #ffe29f, #ffa99f);
+/* Holidays */
+.body-newyear {
+  background: linear-gradient(135deg, #212121, #ffeb3b);
+}
+.body-valentines {
+  background: linear-gradient(135deg, #f48fb1, #ec407a);
+}
+.body-stpatricks {
+  background: linear-gradient(135deg, #388e3c, #c8e6c9);
+}
+.body-easter {
+  background: linear-gradient(135deg, #ffe0b2, #ffcc80);
+}
+.body-july4 {
+  background: linear-gradient(135deg, #2196f3, #f44336);
+}
+.body-halloween {
+  background: linear-gradient(135deg, #4e342e, #212121);
+}
+.body-thanksgiving {
+  background: linear-gradient(135deg, #795548, #bcaaa4);
+}
+.body-christmas {
+  background: linear-gradient(135deg, #c62828, #fbc02d);
 }
 
-body.fall {
-  background: linear-gradient(to bottom, #ff9a9e, #fecfef);
-}
-
-body.winter {
-  background: linear-gradient(to bottom, #a1c4fd, #c2e9fb);
-}
-
-/* Holiday Themes */
-body.christmas-theme {
-  background: linear-gradient(to bottom, #ffecd2, #fcb69f);
-}
-
-body.halloween-theme {
-  background: linear-gradient(to bottom, #3f0d12, #a71d31);
-}
-
-/* Effects */
-.effect {
+/* ----------------------------------------------------
+   FALLING EFFECTS
+----------------------------------------------------- */
+#falling-effects-container {
   position: absolute;
-  animation: fall 10s cubic-bezier(0.33, 1, 0.68, 1) infinite, drift 4s ease-in-out infinite alternate;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* let clicks pass through */
+  overflow: hidden;
+}
+
+.falling-object {
+  position: absolute;
+  top: -50px;
   opacity: 0.8;
+  animation: fall linear;
 }
 
 .snowflake {
-  width: 2vw; /* Scaled for mobile screens */
-  height: 2vw;
-  background: white;
-  border-radius: 50%;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+  color: #fff;
+  font-size: 1.5rem;
 }
 
-.leaf {
-  width: 4vw;
-  height: 4vw;
-  background: #a0522d;
-  border-radius: 50%;
-  transform: rotate(0deg);
-  animation: fall 10s cubic-bezier(0.33, 1, 0.68, 1) infinite, drift 6s ease-in-out infinite alternate, spin 6s linear infinite;
+.bat {
+  color: #000;
+  font-size: 2rem;
+  text-shadow: 2px 2px 2px #ff5722;
 }
 
-.light-flare {
-  width: 3vw;
-  height: 3vw;
-  background: yellow;
-  border-radius: 50%;
-  box-shadow: 0 0 15px rgba(255, 255, 0, 0.5);
+.confetti {
+  font-size: 1.2rem;
 }
 
-/* Animations */
 @keyframes fall {
-  from {
-    transform: translateY(-10%);
+  0% {
+    transform: translateY(-50px) translateX(0);
   }
-  to {
-    transform: translateY(110%);
-  }
-}
-
-@keyframes drift {
-  from {
-    transform: translateX(-15vw); /* Larger drift for mobile */
-  }
-  to {
-    transform: translateX(15vw);
+  100% {
+    transform: translateY(110vh) translateX(0);
   }
 }
 
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
+@keyframes sway {
+  0%, 100% {
+    transform: translateX(0);
   }
-  to {
-    transform: rotate(360deg);
+  50% {
+    transform: translateX(20px);
   }
 }
 
-/* Media Queries for Mobile */
-@media (max-width: 768px) {
-  .effect {
-    animation-duration: 12s, 5s;
+/* ----------------------------------------------------
+   MEDIA QUERIES
+----------------------------------------------------- */
+@media (max-width: 600px) {
+  .hero-title {
+    font-size: 2rem;
   }
-  .hero-text {
-    font-size: 3rem;
+  .hero-greeting {
+    font-size: 1rem;
   }
-  .welcome-message {
-    font-size: 1.2rem;
+  .login-container {
+    width: 80%;
   }
-  .login-form input {
-    width: 200px;
+  .login-input {
+    width: 100%;
   }
 }
