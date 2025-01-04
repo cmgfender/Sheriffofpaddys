@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Modern Sheriff of Paddy's Welcome Page</title>
-  <!-- Optional: Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <!-- Google Fonts (fallback to system sans-serif) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link 
     href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" 
     rel="stylesheet"
@@ -14,9 +14,10 @@
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
+
   <!-- Hero Section -->
   <header class="hero">
-    <h1 class="hero-title">Welcome Friends!</h1>
+    <h1 class="hero-title">Welcome Friends</h1>
     <p id="welcome-message" class="hero-greeting"></p>
   </header>
 
@@ -40,7 +41,7 @@
     </div>
   </section>
 
-  <!-- Link to your JavaScript -->
-  <script src="js/script.js"></script>
+  <!-- Make sure the script loads AFTER the DOM is ready; use defer -->
+  <script src="js/script.js" defer></script>
 </body>
 </html>
