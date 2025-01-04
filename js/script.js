@@ -1,13 +1,26 @@
 /*****************************************************
  * MAIN ENTRY
  *****************************************************/
-window.addEventListener("DOMContentLoaded", () => {
-  // Log for debugging
-  console.log("DOM fully loaded. About to run welcome page logic.");
+/*
+  Using DOMContentLoaded + defer ensures the HTML is parsed
+  before this script runs. That way, getElementById calls
+  will actually find the elements.
+*/
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("DOM fully loaded, starting setup...");
 
-  const holiday = checkHoliday();
-  const timeOfDay = checkTimeOfDay();
-  const season = checkSeason();
+  let holiday = null;
+  let timeOfDay = null;
+  let season = null;
+
+  // Attempt to get date/time info with a fallback
+  try {
+    holiday = checkHoliday();
+    timeOfDay = checkTimeOfDay();
+    season = checkSeason();
+  } catch (err) {
+    console.warn("Error determining holiday/time/season:", err);
+  }
 
   // Apply backgrounds & messages by priority
   applyTheme(holiday, timeOfDay, season);
@@ -18,228 +31,254 @@ window.addEventListener("DOMContentLoaded", () => {
   // Set up the login
   setupLogin();
 
-  console.log("Script finished initializing.");
+  console.log("All scripts initialized successfully.");
 });
 
 /*****************************************************
  * CHECK HOLIDAYS
+ * Returns a string like "christmas", "halloween", or null.
+ * If date is invalid, returns null to fallback safely.
  *****************************************************/
 function checkHoliday() {
-  const today = new Date();
-  const month = today.getMonth() + 1; // 1-12
-  const day = today.getDate();       // 1-31
+  const now = new Date();
 
-  // New Year: Jan 1
+  // If now is invalid, fallback
+  if (isNaN(now.getTime())) {
+    console.warn("Date object is invalid, no holiday can be determined.");
+    return null;
+  }
+
+  const month = now.getMonth() + 1; // 1-12
+  const day = now.getDate();       // 1-31
+
   if (month === 1 && day === 1) return "newyear";
-
-  // Valentine’s Day: Feb 14
   if (month === 2 && day === 14) return "valentines";
-
-  // St. Patrick's Day: Mar 17
   if (month === 3 && day === 17) return "stpatricks";
-
-  // Easter (example date: April 9)
+  // Easter example date: April 9
   if (month === 4 && day === 9) return "easter";
-
-  // Fourth of July: Jul 4
   if (month === 7 && day === 4) return "july4";
-
-  // Halloween: Oct 31
   if (month === 10 && day === 31) return "halloween";
-
-  // Thanksgiving (approx): Nov 24
+  // Approx Thanksgiving: Nov 24
   if (month === 11 && day === 24) return "thanksgiving";
-
-  // Christmas: Dec 25
   if (month === 12 && day === 25) return "christmas";
 
-  return null; // no holiday
+  return null; // No recognized holiday
 }
 
 /*****************************************************
  * CHECK TIME OF DAY
+ * Return strings like "morning", "midday", "afternoon", 
+ * "evening", "night", or "lateNight". If no time is available,
+ * return null for fallback.
  *****************************************************/
 function checkTimeOfDay() {
-  const hour = new Date().getHours();
-  console.log("Current hour:", hour); // for debugging
-
-  if (hour >= 6 && hour < 11) {
-    return "morning";
-  } else if (hour >= 11 && hour < 14) {
-    return "midday";
-  } else if (hour >= 14 && hour < 18) {
-    return "afternoon";
-  } else if (hour >= 18 && hour < 22) {
-    return "evening";
-  } else if (hour >= 22 || hour < 2) {
-    return "night";
-  } else {
-    return "lateNight";
+  const now = new Date();
+  if (isNaN(now.getTime())) {
+    console.warn("Invalid date/time, cannot determine timeOfDay.");
+    return null;
   }
+
+  const hour = now.getHours();
+  console.log("Current hour:", hour);
+
+  if (hour >= 6 && hour < 11) return "morning";
+  if (hour >= 11 && hour < 14) return "midday";
+  if (hour >= 14 && hour < 18) return "afternoon";
+  if (hour >= 18 && hour < 22) return "evening";
+  if (hour >= 22 || hour < 2)  return "night";
+  return "lateNight";
 }
 
 /*****************************************************
  * CHECK SEASON
+ * Return "spring", "summer", "fall", "winter" or null if
+ * date/time is invalid.
  *****************************************************/
 function checkSeason() {
-  const month = new Date().getMonth() + 1;
-  console.log("Current month:", month); // for debugging
-
-  if (month >= 3 && month < 6) {
-    return "spring";
-  } else if (month >= 6 && month < 9) {
-    return "summer";
-  } else if (month >= 9 && month < 12) {
-    return "fall";
-  } else {
-    return "winter";
+  const now = new Date();
+  if (isNaN(now.getTime())) {
+    console.warn("Invalid date, cannot determine season.");
+    return null;
   }
+
+  const month = now.getMonth() + 1;
+  console.log("Current month:", month);
+
+  if (month >= 3 && month < 6) return "spring";
+  if (month >= 6 && month < 9) return "summer";
+  if (month >= 9 && month < 12) return "fall";
+  return "winter";
 }
 
 /*****************************************************
  * APPLY THEME (BACKGROUND & MESSAGE)
  *****************************************************/
 function applyTheme(holiday, timeOfDay, season) {
-  const body = document.body;
-  const welcomeMessage = document.getElementById("welcome-message");
+  console.log("Applying theme with holiday:", holiday, "timeOfDay:", timeOfDay, "season:", season);
 
-  // If element is missing, bail out
-  if (!welcomeMessage) {
-    console.warn("No element with ID 'welcome-message' found.");
+  const body = document.body;
+  const welcomeMsgEl = document.getElementById("welcome-message");
+  if (!welcomeMsgEl) {
+    console.warn("No element #welcome-message found, cannot set text!");
     return;
   }
 
-  // Priority 1: HOLIDAY
+  // FALLBACK GREETING (if everything else fails)
+  let finalMessage = "Hello! We hope you're having a wonderful day.";
+
+  /***********************************************
+   * PRIORITY 1: HOLIDAY
+   ***********************************************/
   if (holiday) {
     switch (holiday) {
       case "newyear":
         body.classList.add("body-newyear");
-        welcomeMessage.textContent = "Happy New Year! Wishing you the best ahead!";
-        return;
+        finalMessage = "Happy New Year! Wishing you the best ahead!";
+        break;
       case "valentines":
         body.classList.add("body-valentines");
-        welcomeMessage.textContent = "Happy Valentine’s Day! Spread the love!";
-        return;
+        finalMessage = "Happy Valentine’s Day! Spread the love!";
+        break;
       case "stpatricks":
         body.classList.add("body-stpatricks");
-        welcomeMessage.textContent = "Happy St. Patrick’s Day! Luck be with you!";
-        return;
+        finalMessage = "Happy St. Patrick’s Day! Luck be with you!";
+        break;
       case "easter":
         body.classList.add("body-easter");
-        welcomeMessage.textContent = "Happy Easter! Enjoy the spring festivities!";
-        return;
+        finalMessage = "Happy Easter! Enjoy the spring festivities!";
+        break;
       case "july4":
         body.classList.add("body-july4");
-        welcomeMessage.textContent = "Happy Fourth of July! Celebrate your freedom!";
-        return;
+        finalMessage = "Happy Fourth of July! Celebrate your freedom!";
+        break;
       case "halloween":
         body.classList.add("body-halloween");
-        welcomeMessage.textContent = "Happy Halloween! Spooky times ahead!";
-        return;
+        finalMessage = "Happy Halloween! Spooky times ahead!";
+        break;
       case "thanksgiving":
         body.classList.add("body-thanksgiving");
-        welcomeMessage.textContent = "Happy Thanksgiving! Enjoy the feast!";
-        return;
+        finalMessage = "Happy Thanksgiving! Enjoy the feast!";
+        break;
       case "christmas":
         body.classList.add("body-christmas");
-        welcomeMessage.textContent = "Merry Christmas! Enjoy the festive season!";
-        return;
+        finalMessage = "Merry Christmas! Enjoy the festive season!";
+        break;
+    }
+
+    // Since holiday has the highest priority, we set final message & STOP
+    welcomeMsgEl.textContent = finalMessage;
+    return;
+  }
+
+  /***********************************************
+   * PRIORITY 2: TIME OF DAY
+   ***********************************************/
+  // Only if there's no holiday or holiday is null
+  if (timeOfDay) {
+    switch (timeOfDay) {
+      case "morning":
+        finalMessage = "Good Morning! Rise and shine!";
+        break;
+      case "midday":
+        finalMessage = "Good Midday! Keep the momentum going!";
+        break;
+      case "afternoon":
+        finalMessage = "Good Afternoon! Keep up the great work.";
+        break;
+      case "evening":
+        finalMessage = "Good Evening! Time to relax and unwind.";
+        break;
+      case "night":
+        finalMessage = "Good Night! Rest well and recharge.";
+        break;
+      case "lateNight":
+        finalMessage = "It's really late! Don’t forget to get some rest.";
+        break;
+      default:
+        // If we get something unexpected, use fallback
+        finalMessage = "Hello! We hope you're having a great day.";
     }
   }
+  // Keep finalMessage for now, because we still want to set a seasonal background after.
 
-  // Priority 2: TIME OF DAY
-  let messageByTime = "";
-  switch (timeOfDay) {
-    case "morning":
-      messageByTime = "Good Morning! Rise and shine!";
-      break;
-    case "midday":
-      messageByTime = "Good Midday! Keep the momentum going!";
-      break;
-    case "afternoon":
-      messageByTime = "Good Afternoon! Keep up the great work.";
-      break;
-    case "evening":
-      messageByTime = "Good Evening! Time to relax and unwind.";
-      break;
-    case "night":
-      messageByTime = "Good Night! Rest well and recharge.";
-      break;
-    default:
-      // lateNight
-      messageByTime = "It's really late! Don’t forget to get some rest.";
+  /***********************************************
+   * PRIORITY 3: SEASON
+   ***********************************************/
+  if (season === "spring") {
+    body.classList.add("body-spring");
+  } else if (season === "summer") {
+    body.classList.add("body-summer");
+  } else if (season === "fall") {
+    body.classList.add("body-fall");
+  } else if (season === "winter") {
+    body.classList.add("body-winter");
   }
+  // If season is null or something unexpected, we leave the default background.
 
-  welcomeMessage.textContent = messageByTime;
-
-  // Priority 3: SEASON
-  switch (season) {
-    case "spring":
-      body.classList.add("body-spring");
-      break;
-    case "summer":
-      body.classList.add("body-summer");
-      break;
-    case "fall":
-      body.classList.add("body-fall");
-      break;
-    default:
-      body.classList.add("body-winter");
-  }
+  welcomeMsgEl.textContent = finalMessage;
 }
 
 /*****************************************************
  * CREATE FALLING EFFECTS
  *****************************************************/
 function createFallingEffects(holiday, season) {
+  // Simple logic: if we recognized a holiday or season, we run certain effects
   if (holiday === "christmas" || season === "winter") {
-    // Snowflakes
     startFallingEffect("snowflake", "❄", 800);
   } else if (holiday === "halloween") {
-    // Bats
     startFallingEffect("bat", "🦇", 1000);
   } else if (holiday === "newyear" || holiday === "july4") {
-    // Confetti
     startFallingEffect("confetti", "★", 300);
   }
 }
 
-function startFallingEffect(effectClass, symbol, interval) {
-  console.log(`Starting falling effect: ${effectClass} at interval ${interval}ms`);
+/**
+ * Repeatedly spawns a falling object at the specified interval.
+ * @param {string} effectClass - e.g. 'snowflake', 'bat', 'confetti'
+ * @param {string} symbol - e.g. '❄', '🦇', '★'
+ * @param {number} intervalMs - e.g. 800 (ms)
+ */
+function startFallingEffect(effectClass, symbol, intervalMs) {
+  console.log(`Starting effect ${effectClass} every ${intervalMs}ms`);
+
+  const container = document.getElementById("falling-effects-container");
+  if (!container) {
+    console.warn("No #falling-effects-container found, cannot create effects.");
+    return;
+  }
 
   const creationInterval = setInterval(() => {
-    const effectEl = document.createElement("div");
-    effectEl.classList.add("falling-object", effectClass);
-    effectEl.innerText = symbol;
+    const el = document.createElement("div");
+    el.classList.add("falling-object", effectClass);
+    el.textContent = symbol;
 
-    // Randomize color for confetti
+    // If confetti, randomize color
     if (effectClass === "confetti") {
       const colors = ["#f44336", "#e91e63", "#9c27b0", "#2196f3", "#4caf50", "#ffeb3b", "#ff9800"];
-      const randomColor = colors[Math.floor(Math.random() * colors.length)];
-      effectEl.style.color = randomColor;
+      el.style.color = colors[Math.floor(Math.random() * colors.length)];
     }
 
     // Random horizontal start
-    effectEl.style.left = Math.random() * 100 + "vw";
+    el.style.left = Math.random() * 100 + "vw";
 
-    // Random fall duration between 5-10s
+    // Random fall duration: 5-10s
     const fallDuration = 5 + Math.random() * 5;
-    effectEl.style.animationDuration = fallDuration + "s";
+    el.style.animationDuration = fallDuration + "s";
 
-    // Optional sway
+    // Optional side-to-side sway
     if (Math.random() > 0.5) {
-      effectEl.style.animationName = "fall, sway";
+      el.style.animationName = "fall, sway";
     }
 
-    // Remove element when animation ends
-    effectEl.addEventListener("animationend", () => {
-      effectEl.remove();
+    // Remove when animation ends
+    el.addEventListener("animationend", () => {
+      el.remove();
     });
 
-    document.getElementById("falling-effects-container").appendChild(effectEl);
-  }, interval);
+    container.appendChild(el);
+  }, intervalMs);
 
-  // Stop after 30s if desired
+  // Stop after 30 seconds if you like:
   // setTimeout(() => clearInterval(creationInterval), 30000);
 }
 
@@ -247,11 +286,11 @@ function startFallingEffect(effectClass, symbol, interval) {
  * LOGIN HANDLER
  *****************************************************/
 function setupLogin() {
-  console.log("Setting up login handler.");
-  
+  console.log("Setting up login...");
+
   const loginForm = document.getElementById("loginForm");
   if (!loginForm) {
-    console.warn("No loginForm found in DOM.");
+    console.warn("No loginForm found, skipping login setup.");
     return;
   }
 
@@ -264,10 +303,8 @@ function setupLogin() {
     }
 
     const password = passwordInput.value.trim();
-
-    // Validate password
     if (password === "Glassmire") {
-      // Replace with your actual tools page
+      // Change this to your actual tools page URL
       window.location.href = "https://your-tools-page.example.com";
     } else {
       alert("Incorrect password. Please try again.");
