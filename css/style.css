@@ -100,16 +100,16 @@ body.halloween-theme {
 }
 
 .snowflake {
-  width: 10px;
-  height: 10px;
+  width: 2vw; /* Scaled for mobile screens */
+  height: 2vw;
   background: white;
   border-radius: 50%;
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
 }
 
 .leaf {
-  width: 20px;
-  height: 20px;
+  width: 4vw;
+  height: 4vw;
   background: #a0522d;
   border-radius: 50%;
   transform: rotate(0deg);
@@ -117,8 +117,8 @@ body.halloween-theme {
 }
 
 .light-flare {
-  width: 15px;
-  height: 15px;
+  width: 3vw;
+  height: 3vw;
   background: yellow;
   border-radius: 50%;
   box-shadow: 0 0 15px rgba(255, 255, 0, 0.5);
@@ -136,10 +136,10 @@ body.halloween-theme {
 
 @keyframes drift {
   from {
-    transform: translateX(-30px);
+    transform: translateX(-15vw); /* Larger drift for mobile */
   }
   to {
-    transform: translateX(30px);
+    transform: translateX(15vw);
   }
 }
 
@@ -149,5 +149,21 @@ body.halloween-theme {
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* Media Queries for Mobile */
+@media (max-width: 768px) {
+  .effect {
+    animation-duration: 12s, 5s;
+  }
+  .hero-text {
+    font-size: 3rem;
+  }
+  .welcome-message {
+    font-size: 1.2rem;
+  }
+  .login-form input {
+    width: 200px;
   }
 }
