@@ -1,10 +1,11 @@
+// Configuration
 const SERVER_IP = "108.4.212.114"; // Replace if needed
 const RADARR_PORT = 7878; // Default Radarr port
 const SONARR_PORT = 8989; // Default Sonarr port
 const RADARR_API_KEY = "5c6b0e2559344f8ba928b16bdb599a40";
 const SONARR_API_KEY = "ce6baebf009e427183f39a5bc554e384";
+const PLEX_URL = "https://192-168-68-50.820699f2276e43b99e6e530a900c4ca0.plex.direct:32400";
 const PLEX_TOKEN = "xmq2Ucn2L3fGrZy1SoJq";
-const PLEX_SERVER_URL = `https://${SERVER_IP}.820699f2276e43b99e6e530a900c4ca0.plex.direct:32400`;
 
 /*****************************************************
  * PLEX SERVER STATUS with Active Streams
@@ -17,7 +18,7 @@ async function updatePlexStatus() {
   }
 
   try {
-    const response = await fetch(`${PLEX_SERVER_URL}/status/sessions?X-Plex-Token=${PLEX_TOKEN}`, {
+    const response = await fetch(`${PLEX_URL}/status/sessions?X-Plex-Token=${PLEX_TOKEN}`, {
       method: "GET",
       mode: "cors",
     });
@@ -33,16 +34,17 @@ async function updatePlexStatus() {
     const streamCount = parseInt(mediaContainer?.getAttribute("size") || "0", 10);
 
     if (streamCount > 0) {
-      plexStatusElement.innerHTML =
-        `Status: <span style="color: #4caf50;">Online</span> – Active Streams: <span style="color: #4caf50;">${streamCount}</span>`;
+      plexStatusElement.innerHTML = `
+        Status: <span style="color: #4caf50;">Online</span> – 
+        Active Streams: <span style="color: #4caf50;">${streamCount}</span>`;
     } else {
-      plexStatusElement.innerHTML =
-        `Status: <span style="color: #4caf50;">Online</span> – No Active Streams`;
+      plexStatusElement.innerHTML = `
+        Status: <span style="color: #4caf50;">Online</span> – 
+        No Active Streams`;
     }
   } catch (error) {
     console.error("Error fetching Plex status:", error);
-    plexStatusElement.innerHTML =
-      'Status: <span style="color: #f44336;">Offline</span>';
+    plexStatusElement.innerHTML = 'Status: <span style="color: #f44336;">Offline</span>';
   }
 }
 
@@ -79,7 +81,9 @@ async function fetchSonarrShows() {
     sonarrList.innerHTML = ""; // Clear placeholder
     data.forEach(show => {
       const li = document.createElement("li");
-      li.textContent = `${show.series.title} S${show.seasonNumber}E${show.episodeNumber} - ${show.title} (Airs: ${new Date(show.airDateUtc).toLocaleDateString()})`;
+      li.textContent = `
+        ${show.series.title} S${show.seasonNumber}E${show.episodeNumber} - 
+        ${show.title} (Airs: ${new Date(show.airDateUtc).toLocaleDateString()})`;
       sonarrList.appendChild(li);
     });
   } catch (error) {
