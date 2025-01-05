@@ -371,7 +371,7 @@ function setupLogin() {
     const password = passwordInput.value.trim();
     if (password === "Glassmire") {
       // Change this to your actual tools page URL
-      window.location.href = "https://your-tools-page.example.com";
+      window.location.href = "tools.html";
     } else {
       alert("Incorrect password. Please try again.");
     }
