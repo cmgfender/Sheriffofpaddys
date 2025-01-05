@@ -386,3 +386,22 @@ function setupLogin() {
     }
   });
 }
+/**
+ * Dynamically update Plex server status
+ * This function can be replaced with an API call in the future.
+ */
+function updatePlexStatus() {
+  const plexStatusElement = document.getElementById("plex-status");
+  const isServerOnline = true; // Mock status, replace with real logic
+
+  if (isServerOnline) {
+    plexStatusElement.innerHTML = 'Status: <span class="status-placeholder" style="color: #4caf50;">Online</span>';
+  } else {
+    plexStatusElement.innerHTML = 'Status: <span class="status-placeholder" style="color: #f44336;">Offline</span>';
+  }
+}
+
+// Call the Plex status updater after DOM content loads
+document.addEventListener("DOMContentLoaded", () => {
+  updatePlexStatus();
+});
