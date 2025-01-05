@@ -26,6 +26,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // Set up the login
   setupLogin();
 
+  // Attempt to update Plex server status
+  updatePlexStatus();
+
   console.log("All scripts initialized successfully.");
 });
 
@@ -46,12 +49,12 @@ function checkHoliday() {
   const month = now.getMonth() + 1; // 1-12
   const day = now.getDate();       // 1-31
 
-  if (month === 1 && day === 1) return "newyear";
+  if (month === 1 && day === 1)  return "newyear";
   if (month === 2 && day === 14) return "valentines";
   if (month === 3 && day === 17) return "stpatricks";
-  // Easter example date: April 9
-  if (month === 4 && day === 9) return "easter";
-  if (month === 7 && day === 4) return "july4";
+  // Easter example date: April 9 (adjust as needed)
+  if (month === 4 && day === 9)  return "easter";
+  if (month === 7 && day === 4)  return "july4";
   if (month === 10 && day === 31) return "halloween";
   // Approx Thanksgiving: Nov 24
   if (month === 11 && day === 24) return "thanksgiving";
@@ -62,8 +65,6 @@ function checkHoliday() {
 
 /*****************************************************
  * TIME-OF-DAY GREETINGS
- * Each key has an array of possible messages.
- * We'll pick one at random in checkTimeOfDay().
  *****************************************************/
 const timeOfDayGreetings = {
   morning: [
@@ -134,9 +135,6 @@ function getRandomMessageFromArray(array) {
 
 /*****************************************************
  * CHECK TIME OF DAY
- * Return strings like:
- *   "morning", "lateMorning", "midday", "earlyAfternoon",
- *   "happyHour", "dinnerTime", "primeTime", "night", "lateNight"
  *****************************************************/
 function checkTimeOfDay() {
   const now = new Date();
@@ -148,16 +146,16 @@ function checkTimeOfDay() {
   const hour = now.getHours();
   console.log("Current hour:", hour);
 
-  // Adjust these ranges however you see fit!
-  //  5-10      = morning
-  //  10-12     = lateMorning
-  //  12-14     = midday
-  //  14-16     = earlyAfternoon
-  //  16-18     = happyHour
-  //  18-20     = dinnerTime
-  //  20-22     = primeTime
-  //  22-24     = night
-  //  0-5       = lateNight
+  // Customize these ranges as needed:
+  //  5-10   = morning
+  //  10-12  = lateMorning
+  //  12-14  = midday
+  //  14-16  = earlyAfternoon
+  //  16-18  = happyHour
+  //  18-20  = dinnerTime
+  //  20-22  = primeTime
+  //  22-24  = night
+  //  0-5    = lateNight
 
   if (hour >= 5 && hour < 10)  return "morning";
   if (hour >= 10 && hour < 12) return "lateMorning";
@@ -172,8 +170,6 @@ function checkTimeOfDay() {
 
 /*****************************************************
  * CHECK SEASON
- * Return "spring", "summer", "fall", "winter" or null if
- * date/time is invalid.
  *****************************************************/
 function checkSeason() {
   const now = new Date();
@@ -208,12 +204,9 @@ function applyTheme(holiday, timeOfDay, season) {
   let finalMessage = "Hello! We hope you're having a wonderful day.";
 
   /***********************************************
-   * PRIORITY 1: HOLIDAY (single message or random)
+   * PRIORITY 1: HOLIDAY
    ***********************************************/
   if (holiday) {
-    // If you want multiple holiday messages, you can also define
-    // an object like holidayMessages[holiday] = ["msg1", "msg2", ...]
-    // For now, we just have single messages, but you can expand similarly.
     switch (holiday) {
       case "newyear":
         body.classList.add("body-newyear");
@@ -249,16 +242,15 @@ function applyTheme(holiday, timeOfDay, season) {
         break;
     }
 
-    // Since holiday has the highest priority, we set final message & STOP
+    // Holiday has the highest priority, so set final message and stop.
     welcomeMsgEl.textContent = finalMessage;
     return;
   }
 
   /***********************************************
-   * PRIORITY 2: TIME OF DAY (randomized)
+   * PRIORITY 2: TIME OF DAY (Randomized message)
    ***********************************************/
   if (timeOfDay) {
-    // Grab a random greeting for the identified timeOfDay
     const randomTimeMsg = getRandomMessageFromArray(timeOfDayGreetings[timeOfDay]);
     if (randomTimeMsg) {
       finalMessage = randomTimeMsg;
@@ -266,13 +258,12 @@ function applyTheme(holiday, timeOfDay, season) {
   }
 
   /***********************************************
-   * PRIORITY 3: SEASON (background & optional extra note)
+   * PRIORITY 3: SEASON (Background & optional note)
    ***********************************************/
   if (season) {
     switch (season) {
       case "spring":
         body.classList.add("body-spring");
-        // Optionally append something to the final message:
         finalMessage += " Enjoy the blossoming flowers of Spring!";
         break;
       case "summer":
@@ -353,7 +344,7 @@ function startFallingEffect(effectClass, symbol, intervalMs) {
     container.appendChild(el);
   }, intervalMs);
 
-  // Stop after 30 seconds if desired:
+  // If you want to stop them after 30s, uncomment:
   // setTimeout(() => clearInterval(creationInterval), 30000);
 }
 
@@ -386,22 +377,38 @@ function setupLogin() {
     }
   });
 }
-/**
- * Dynamically update Plex server status
- * This function can be replaced with an API call in the future.
- */
-function updatePlexStatus() {
-  const plexStatusElement = document.getElementById("plex-status");
-  const isServerOnline = true; // Mock status, replace with real logic
 
-  if (isServerOnline) {
-    plexStatusElement.innerHTML = 'Status: <span class="status-placeholder" style="color: #4caf50;">Online</span>';
-  } else {
+/*****************************************************
+ * PLEX SERVER STATUS
+ * Replace the server URL and token with your actual values.
+ *****************************************************/
+async function updatePlexStatus() {
+  const plexStatusElement = document.getElementById("plex-status");
+  if (!plexStatusElement) {
+    console.warn("No #plex-status element found. Skipping Plex status update.");
+    return;
+  }
+
+  // Example: using your direct or public address (HTTPS if possible)
+  // Ensure your server and token are correct and accessible.
+  const plexServerUrl = "https://108-4-212-114.820699f2276e43b99e6e530a900c4ca0.plex.direct:32400/status/sessions";
+  const plexToken = "xmq2Ucn2L3fGrZy1SoJq"; // Replace with your token
+
+  try {
+    // Attempt fetching Plex sessions (a simple test for server availability)
+    const response = await fetch(`${plexServerUrl}?X-Plex-Token=${plexToken}`, {
+      method: "GET",
+      mode: "cors"
+    });
+
+    if (response.ok) {
+      // If response is okay, consider server online
+      plexStatusElement.innerHTML = 'Status: <span class="status-placeholder" style="color: #4caf50;">Online</span>';
+    } else {
+      throw new Error("Unable to reach Plex server.");
+    }
+  } catch (error) {
+    console.error("Error fetching Plex status:", error);
     plexStatusElement.innerHTML = 'Status: <span class="status-placeholder" style="color: #f44336;">Offline</span>';
   }
 }
-
-// Call the Plex status updater after DOM content loads
-document.addEventListener("DOMContentLoaded", () => {
-  updatePlexStatus();
-});
