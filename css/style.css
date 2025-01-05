@@ -460,7 +460,32 @@ body {
     transform: translateX(20px);
   }
 }
+/* STATUS AREA */
+.status-area {
+  margin-top: 2rem;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
 
+.status-area h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #00acc1;
+}
+
+.status-area p {
+  font-size: 1rem;
+  color: #fff;
+}
+
+.status-placeholder {
+  font-weight: bold;
+  color: #ffc107;
+}
 /****************************************************
   RESPONSIVENESS
 ****************************************************/
