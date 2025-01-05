@@ -382,6 +382,9 @@ function setupLogin() {
  * PLEX SERVER STATUS
  * Replace the server URL and token with your actual values.
  *****************************************************/
+/*****************************************************
+ * PLEX SERVER STATUS with Active Streams
+ *****************************************************/
 async function updatePlexStatus() {
   const plexStatusElement = document.getElementById("plex-status");
   if (!plexStatusElement) {
@@ -389,26 +392,53 @@ async function updatePlexStatus() {
     return;
   }
 
-  // Example: using your direct or public address (HTTPS if possible)
-  // Ensure your server and token are correct and accessible.
+  // Replace with your Plex server details
+  // Example: "https://[subdomain].plex.direct:32400/status/sessions"
   const plexServerUrl = "https://108-4-212-114.820699f2276e43b99e6e530a900c4ca0.plex.direct:32400/status/sessions";
-  const plexToken = "xmq2Ucn2L3fGrZy1SoJq"; // Replace with your token
+  const plexToken = "xmq2Ucn2L3fGrZy1SoJq"; // Replace with your Plex Token
 
   try {
-    // Attempt fetching Plex sessions (a simple test for server availability)
+    // Fetch the /status/sessions endpoint to see if Plex is reachable
     const response = await fetch(`${plexServerUrl}?X-Plex-Token=${plexToken}`, {
       method: "GET",
-      mode: "cors"
+      mode: "cors",  // May need config if you run into CORS issues
+      headers: {
+        // If you prefer JSON response (and have configured Plex to return JSON), you can uncomment:
+        // "Accept": "application/json"
+      }
     });
 
-    if (response.ok) {
-      // If response is okay, consider server online
-      plexStatusElement.innerHTML = 'Status: <span class="status-placeholder" style="color: #4caf50;">Online</span>';
-    } else {
+    if (!response.ok) {
+      // Non-2xx status code => treat as offline
       throw new Error("Unable to reach Plex server.");
     }
+
+    // If OK, parse the response to find how many active streams exist
+    const data = await response.text();
+    // By default, Plex returns XML from /status/sessions
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(data, "text/xml");
+    const mediaContainer = xmlDoc.querySelector("MediaContainer");
+
+    // The "size" attribute on <MediaContainer> tells how many active streams
+    const sizeAttr = mediaContainer?.getAttribute("size") || "0";
+    const streamCount = parseInt(sizeAttr, 10) || 0;
+
+    if (streamCount > 0) {
+      // If there are active streams
+      plexStatusElement.innerHTML =
+        `Status: <span class="status-placeholder" style="color: #4caf50;">Online</span>` +
+        ` – Active Streams: <span class="status-placeholder" style="color: #4caf50;">${streamCount}</span>`;
+    } else {
+      // Online but no active streams
+      plexStatusElement.innerHTML =
+        `Status: <span class="status-placeholder" style="color: #4caf50;">Online</span>` +
+        ` – No Active Streams`;
+    }
   } catch (error) {
+    // If fetch fails or the server is unreachable, mark as Offline
     console.error("Error fetching Plex status:", error);
-    plexStatusElement.innerHTML = 'Status: <span class="status-placeholder" style="color: #f44336;">Offline</span>';
+    plexStatusElement.innerHTML =
+      'Status: <span class="status-placeholder" style="color: #f44336;">Offline</span>';
   }
 }
