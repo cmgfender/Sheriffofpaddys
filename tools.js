@@ -1,3 +1,17 @@
+// Plex Server Configuration
+const PLEX_URL = "http://108.4.212.114:32400"; // Plex server URL
+const PLEX_TOKEN = "your-plex-token"; // Replace this with your actual Plex token
+
+// Radarr Configuration
+const SERVER_IP = "108.4.212.114"; // Server IP for Radarr and Sonarr
+const RADARR_PORT = "7878"; // Default Radarr port
+const RADARR_API_KEY = "5c6b0e2559344f8ba928b16bdb599a40"; // Radarr API key
+
+// Sonarr Configuration
+const SONARR_PORT = "8989"; // Default Sonarr port
+const SONARR_API_KEY = "ce6baebf009e427183f39a5bc554e384"; // Sonarr API key
+
+
 /*****************************************************
  * PLEX SERVER STATUS with Active Streams
  *****************************************************/
