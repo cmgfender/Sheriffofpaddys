@@ -1,6 +1,6 @@
 // Plex Server Configuration
 const PLEX_URL = "http://108.4.212.114:32400"; // Plex server URL
-const PLEX_TOKEN = "your-plex-token"; // Replace this with your actual Plex token
+const PLEX_TOKEN = "yvrB6w9_AfPEsvbjS4KL"; // Replace this with your actual Plex token
 
 // Radarr Configuration
 const SERVER_IP = "108.4.212.114"; // Server IP for Radarr and Sonarr
@@ -23,13 +23,12 @@ async function updatePlexStatus() {
   }
 
   try {
-    const response = await fetch(`${PLEX_URL}/status/sessions?X-Plex-Token=${PLEX_TOKEN}`, {
+    const response = await fetch(`http://108.4.212.114:32400/status/sessions?X-Plex-Token=${PLEX_TOKEN}`, {
       method: "GET",
       mode: "cors",
-      credentials: "include",
     });
 
-    console.log('Plex Response Status:', response.status);
+    console.log("Plex Response Status:", response.status);
 
     if (!response.ok) {
       throw new Error(`Failed to fetch Plex status. HTTP Status: ${response.status}`);
@@ -47,8 +46,7 @@ async function updatePlexStatus() {
         : `Status: <span style="color: #4caf50;">Online</span> – No Active Streams`;
   } catch (error) {
     console.error("Error fetching Plex status:", error);
-    plexStatusElement.innerHTML =
-      'Status: <span style="color: #f44336;">Offline</span>';
+    plexStatusElement.innerHTML = 'Status: <span style="color: #f44336;">Offline</span>';
   }
 }
 
@@ -56,18 +54,33 @@ async function updatePlexStatus() {
  * RADARR UPCOMING MOVIES
  *****************************************************/
 async function fetchRadarrMovies() {
+  const radarrList = document.getElementById("radarr-list");
+  if (!radarrList) {
+    console.warn("No #radarr-list element found. Skipping Radarr update.");
+    return;
+  }
+
   try {
-    const response = await fetch(`http://${SERVER_IP}:${RADARR_PORT}/api/v3/calendar?apikey=${RADARR_API_KEY}`);
-    console.log('Radarr Response Status:', response.status);
+    const today = new Date().toISOString();
+    const nextMonth = new Date();
+    nextMonth.setDate(nextMonth.getDate() + 30);
+    const endDate = nextMonth.toISOString();
+
+    const response = await fetch(`http://108.4.212.114:7878/api/v3/calendar?apikey=5c6b0e2559344f8ba928b16bdb599a40&start=${today}&end=${endDate}`);
+    console.log("Radarr Response Status:", response.status);
 
     if (!response.ok) {
       throw new Error(`Failed to fetch Radarr movies. HTTP Status: ${response.status}`);
     }
 
     const data = await response.json();
-    const radarrList = document.getElementById("radarr-list");
-
     radarrList.innerHTML = ""; // Clear placeholder
+
+    if (data.length === 0) {
+      radarrList.textContent = "No upcoming movies found.";
+      return;
+    }
+
     data.forEach(movie => {
       const li = document.createElement("li");
       li.textContent = `${movie.title} (Releases: ${new Date(movie.physicalRelease).toLocaleDateString()})`;
@@ -75,7 +88,7 @@ async function fetchRadarrMovies() {
     });
   } catch (error) {
     console.error("Error fetching Radarr movies:", error);
-    document.getElementById("radarr-list").textContent = "Error loading movies.";
+    radarrList.textContent = "Error loading movies.";
   }
 }
 
@@ -83,18 +96,33 @@ async function fetchRadarrMovies() {
  * SONARR UPCOMING SHOWS
  *****************************************************/
 async function fetchSonarrShows() {
+  const sonarrList = document.getElementById("sonarr-list");
+  if (!sonarrList) {
+    console.warn("No #sonarr-list element found. Skipping Sonarr update.");
+    return;
+  }
+
   try {
-    const response = await fetch(`http://${SERVER_IP}:${SONARR_PORT}/api/v3/calendar?apikey=${SONARR_API_KEY}`);
-    console.log('Sonarr Response Status:', response.status);
+    const today = new Date().toISOString();
+    const nextMonth = new Date();
+    nextMonth.setDate(nextMonth.getDate() + 30);
+    const endDate = nextMonth.toISOString();
+
+    const response = await fetch(`http://108.4.212.114:8989/api/v3/calendar?apikey=ce6baebf009e427183f39a5bc554e384&start=${today}&end=${endDate}`);
+    console.log("Sonarr Response Status:", response.status);
 
     if (!response.ok) {
       throw new Error(`Failed to fetch Sonarr shows. HTTP Status: ${response.status}`);
     }
 
     const data = await response.json();
-    const sonarrList = document.getElementById("sonarr-list");
-
     sonarrList.innerHTML = ""; // Clear placeholder
+
+    if (data.length === 0) {
+      sonarrList.textContent = "No upcoming shows found.";
+      return;
+    }
+
     data.forEach(show => {
       const li = document.createElement("li");
       li.textContent = `${show.series.title} S${show.seasonNumber}E${show.episodeNumber} - ${show.title} (Airs: ${new Date(show.airDateUtc).toLocaleDateString()})`;
@@ -102,6 +130,13 @@ async function fetchSonarrShows() {
     });
   } catch (error) {
     console.error("Error fetching Sonarr shows:", error);
-    document.getElementById("sonarr-list").textContent = "Error loading shows.";
+    sonarrList.textContent = "Error loading shows.";
   }
 }
+
+/*****************************************************
+ * INITIALIZATION
+ *****************************************************/
+updatePlexStatus();
+fetchRadarrMovies();
+fetchSonarrShows();
