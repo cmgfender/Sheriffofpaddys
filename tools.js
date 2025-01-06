@@ -8,7 +8,7 @@ const RADARR_PORT = "7878"; // Default Radarr port
 const RADARR_API_KEY = "5c6b0e2559344f8ba928b16bdb599a40"; // Radarr API key
 
 // Sonarr Configuration
-const SONARR_PORT = "8989"; // Default Sonarr port
+const SONARR_PORT = "8989"; // Default Sonarr ports
 const SONARR_API_KEY = "ce6baebf009e427183f39a5bc554e384"; // Sonarr API key
 
 
