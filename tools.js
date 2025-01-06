@@ -1,5 +1,5 @@
 // Plex Server Configuration
-const PLEX_URL = "http://108.4.212.114:32400"; // Plex server URL
+const PLEX_URL = "https://108.4.212.114:32400"; // Plex server URL
 const PLEX_TOKEN = "yvrB6w9_AfPEsvbjS4KL"; // Replace this with your actual Plex token
 
 // Radarr Configuration
@@ -23,7 +23,7 @@ async function updatePlexStatus() {
   }
 
   try {
-    const response = await fetch(`http://108.4.212.114:32400/status/sessions?X-Plex-Token=${PLEX_TOKEN}`, {
+    const response = await fetch(`https://108.4.212.114:32400/status/sessions?X-Plex-Token=${PLEX_TOKEN}`, {
       method: "GET",
       mode: "cors",
     });
@@ -66,7 +66,7 @@ async function fetchRadarrMovies() {
     nextMonth.setDate(nextMonth.getDate() + 30);
     const endDate = nextMonth.toISOString();
 
-    const response = await fetch(`http://108.4.212.114:7878/api/v3/calendar?apikey=5c6b0e2559344f8ba928b16bdb599a40&start=${today}&end=${endDate}`);
+    const response = await fetch(`https://108.4.212.114:7878/api/v3/calendar?apikey=5c6b0e2559344f8ba928b16bdb599a40&start=${today}&end=${endDate}`);
     console.log("Radarr Response Status:", response.status);
 
     if (!response.ok) {
@@ -108,7 +108,7 @@ async function fetchSonarrShows() {
     nextMonth.setDate(nextMonth.getDate() + 30);
     const endDate = nextMonth.toISOString();
 
-    const response = await fetch(`http://108.4.212.114:8989/api/v3/calendar?apikey=ce6baebf009e427183f39a5bc554e384&start=${today}&end=${endDate}`);
+    const response = await fetch(`https://108.4.212.114:8989/api/v3/calendar?apikey=ce6baebf009e427183f39a5bc554e384&start=${today}&end=${endDate}`);
     console.log("Sonarr Response Status:", response.status);
 
     if (!response.ok) {
