@@ -1,466 +1,12 @@
-/****************************************************
-  BASIC & RESET
-****************************************************/
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html, body {
-  height: 100%;
-}
-
-/* Provide fallback color and multiple gradient prefixes */
+/* General Styles */
 body {
-  /* Fallback color if gradients fail */
+  font-family: 'Poppins', sans-serif;
   background-color: #333;
-
-  /* Multi-stop gradient with angled transitions */
-  background: -webkit-linear-gradient(
-    135deg,
-    #333 0%,
-    #445 40%,
-    #778 80%
-  );
-  background: -moz-linear-gradient(
-    135deg,
-    #333 0%,
-    #445 40%,
-    #778 80%
-  );
-  background: linear-gradient(
-    135deg,
-    #333 0%,
-    #445 40%,
-    #778 80%
-  );
-
   color: #fff;
-  font-family: 'Poppins', sans-serif, Arial, sans-serif;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  overflow: hidden; /* hide scrollbars for falling objects */
-  transition: background 0.8s ease;
-}
-
-/****************************************************
-  HERO SECTION
-****************************************************/
-.hero {
-  width: 100%;
   text-align: center;
-  padding: 2rem 1rem 1rem;
-  background-color: rgba(0, 0, 0, 0.2); /* subtle overlay */
 }
 
-.hero-title {
-  font-size: 2.2rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
-}
-
-.hero-greeting {
-  font-size: 1.2rem;
-  font-style: italic;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-}
-
-/****************************************************
-  LOGIN SECTION
-****************************************************/
-.login-section {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-}
-
-.login-container {
-  margin-top: 2rem;
-  background-color: rgba(255, 255, 255, 0.1);
-  padding: 1rem 2rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-}
-
-.login-form {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.login-label {
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-}
-
-.login-input {
-  width: 220px;
-  padding: 0.5rem;
-  margin-bottom: 1rem;
-  border: none;
-  border-radius: 4px;
-  outline: none;
-  font-size: 1rem;
-  font-family: inherit;
-}
-
-.login-button {
-  padding: 0.5rem 1.5rem;
-  font-size: 1rem;
-  background-color: #00acc1;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  color: #fff;
-  font-weight: 600;
-}
-
-.login-button:hover {
-  background-color: #00838f;
-}
-
-/****************************************************
-  SEASON & HOLIDAY BACKGROUNDS (Multi-Stop Gradients)
-****************************************************/
-/* SPRING */
-.body-spring {
-  background-color: #6bd1a2; /* fallback */
-  background: -webkit-linear-gradient(
-    135deg,
-    #6bd1a2 0%,
-    #81e6bf 40%,
-    #b2ffda 80%
-  );
-  background: -moz-linear-gradient(
-    135deg,
-    #6bd1a2 0%,
-    #81e6bf 40%,
-    #b2ffda 80%
-  );
-  background: linear-gradient(
-    135deg,
-    #6bd1a2 0%,
-    #81e6bf 40%,
-    #b2ffda 80%
-  );
-}
-
-/* SUMMER */
-.body-summer {
-  background-color: #ffd54f;
-  background: -webkit-linear-gradient(
-    135deg,
-    #ffd54f 0%,
-    #ffc107 40%,
-    #ffb300 80%
-  );
-  background: -moz-linear-gradient(
-    135deg,
-    #ffd54f 0%,
-    #ffc107 40%,
-    #ffb300 80%
-  );
-  background: linear-gradient(
-    135deg,
-    #ffd54f 0%,
-    #ffc107 40%,
-    #ffb300 80%
-  );
-}
-
-/* FALL */
-.body-fall {
-  background-color: #d84315;
-  background: -webkit-linear-gradient(
-    135deg,
-    #d84315 0%,
-    #ef6c00 40%,
-    #bf360c 80%
-  );
-  background: -moz-linear-gradient(
-    135deg,
-    #d84315 0%,
-    #ef6c00 40%,
-    #bf360c 80%
-  );
-  background: linear-gradient(
-    135deg,
-    #d84315 0%,
-    #ef6c00 40%,
-    #bf360c 80%
-  );
-}
-
-/* WINTER */
-.body-winter {
-  background-color: #90caf9;
-  background: -webkit-linear-gradient(
-    135deg,
-    #90caf9 0%,
-    #42a5f5 40%,
-    #1e88e5 80%
-  );
-  background: -moz-linear-gradient(
-    135deg,
-    #90caf9 0%,
-    #42a5f5 40%,
-    #1e88e5 80%
-  );
-  background: linear-gradient(
-    135deg,
-    #90caf9 0%,
-    #42a5f5 40%,
-    #1e88e5 80%
-  );
-}
-
-/****************************************************
-  HOLIDAYS
-****************************************************/
-/* NEW YEAR */
-.body-newyear {
-  background-color: #212121;
-  background: -webkit-linear-gradient(
-    135deg,
-    #212121 0%,
-    #ffeb3b 40%,
-    #fdd835 80%
-  );
-  background: -moz-linear-gradient(
-    135deg,
-    #212121 0%,
-    #ffeb3b 40%,
-    #fdd835 80%
-  );
-  background: linear-gradient(
-    135deg,
-    #212121 0%,
-    #ffeb3b 40%,
-    #fdd835 80%
-  );
-}
-
-/* VALENTINE'S DAY */
-.body-valentines {
-  background-color: #f48fb1;
-  background: -webkit-linear-gradient(
-    135deg,
-    #f48fb1 0%,
-    #ec407a 40%,
-    #d81b60 80%
-  );
-  background: -moz-linear-gradient(
-    135deg,
-    #f48fb1 0%,
-    #ec407a 40%,
-    #d81b60 80%
-  );
-  background: linear-gradient(
-    135deg,
-    #f48fb1 0%,
-    #ec407a 40%,
-    #d81b60 80%
-  );
-}
-
-/* ST. PATRICK'S */
-.body-stpatricks {
-  background-color: #388e3c;
-  background: -webkit-linear-gradient(
-    135deg,
-    #388e3c 0%,
-    #4caf50 40%,
-    #c8e6c9 80%
-  );
-  background: -moz-linear-gradient(
-    135deg,
-    #388e3c 0%,
-    #4caf50 40%,
-    #c8e6c9 80%
-  );
-  background: linear-gradient(
-    135deg,
-    #388e3c 0%,
-    #4caf50 40%,
-    #c8e6c9 80%
-  );
-}
-
-/* EASTER */
-.body-easter {
-  background-color: #ffe0b2;
-  background: -webkit-linear-gradient(
-    135deg,
-    #ffe0b2 0%,
-    #ffcc80 40%,
-    #ffe0b2 80%
-  );
-  background: -moz-linear-gradient(
-    135deg,
-    #ffe0b2 0%,
-    #ffcc80 40%,
-    #ffe0b2 80%
-  );
-  background: linear-gradient(
-    135deg,
-    #ffe0b2 0%,
-    #ffcc80 40%,
-    #ffe0b2 80%
-  );
-}
-
-/* JULY 4 */
-.body-july4 {
-  background-color: #2196f3;
-  background: -webkit-linear-gradient(
-    135deg,
-    #2196f3 0%,
-    #f44336 40%,
-    #ffffff 80%
-  );
-  background: -moz-linear-gradient(
-    135deg,
-    #2196f3 0%,
-    #f44336 40%,
-    #ffffff 80%
-  );
-  background: linear-gradient(
-    135deg,
-    #2196f3 0%,
-    #f44336 40%,
-    #ffffff 80%
-  );
-}
-
-/* HALLOWEEN */
-.body-halloween {
-  background-color: #4e342e;
-  background: -webkit-linear-gradient(
-    135deg,
-    #4e342e 0%,
-    #ff5722 40%,
-    #212121 80%
-  );
-  background: -moz-linear-gradient(
-    135deg,
-    #4e342e 0%,
-    #ff5722 40%,
-    #212121 80%
-  );
-  background: linear-gradient(
-    135deg,
-    #4e342e 0%,
-    #ff5722 40%,
-    #212121 80%
-  );
-}
-
-/* THANKSGIVING */
-.body-thanksgiving {
-  background-color: #795548;
-  background: -webkit-linear-gradient(
-    135deg,
-    #795548 0%,
-    #bcaaa4 40%,
-    #a1887f 80%
-  );
-  background: -moz-linear-gradient(
-    135deg,
-    #795548 0%,
-    #bcaaa4 40%,
-    #a1887f 80%
-  );
-  background: linear-gradient(
-    135deg,
-    #795548 0%,
-    #bcaaa4 40%,
-    #a1887f 80%
-  );
-}
-
-/* CHRISTMAS */
-.body-christmas {
-  background-color: #c62828;
-  background: -webkit-linear-gradient(
-    135deg,
-    #c62828 0%,
-    #fbc02d 40%,
-    #388e3c 80%
-  );
-  background: -moz-linear-gradient(
-    135deg,
-    #c62828 0%,
-    #fbc02d 40%,
-    #388e3c 80%
-  );
-  background: linear-gradient(
-    135deg,
-    #c62828 0%,
-    #fbc02d 40%,
-    #388e3c 80%
-  );
-}
-
-/****************************************************
-  FALLING EFFECTS
-****************************************************/
-#falling-effects-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.falling-object {
-  position: absolute;
-  top: -50px;
-  opacity: 0.8;
-  animation: fall linear;
-}
-
-.snowflake {
-  color: #fff;
-  font-size: 1.5rem;
-}
-
-.bat {
-  color: #000;
-  font-size: 2rem;
-  text-shadow: 2px 2px 2px #ff5722;
-}
-
-.confetti {
-  font-size: 1.2rem;
-}
-
-/****************************************************
-  ANIMATIONS
-****************************************************/
-@keyframes fall {
-  0% {
-    transform: translateY(-50px) translateX(0);
-  }
-  100% {
-    transform: translateY(110vh) translateX(0);
-  }
-}
-
-@keyframes sway {
-  0%, 100% {
-    transform: translateX(0);
-  }
-  50% {
-    transform: translateX(20px);
-  }
-}
-/* STATUS AREA */
+/* Status Area */
 .status-area {
   margin-top: 2rem;
   padding: 1rem;
@@ -469,34 +15,43 @@ body {
   text-align: center;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
-
-.status-area h3 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: #00acc1;
-}
-
 .status-area p {
   font-size: 1rem;
-  color: #fff;
 }
 
-.status-placeholder {
+/* Status Colors */
+.status-up {
+  color: #4caf50;
   font-weight: bold;
-  color: #ffc107;
 }
-/****************************************************
-  RESPONSIVENESS
-****************************************************/
+.status-down {
+  color: #f44336;
+  font-weight: bold;
+}
+
+/* Calendar Events */
+.calendar-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+}
+.event {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 10px;
+  margin: 5px;
+  border-radius: 5px;
+  width: 80%;
+  text-align: left;
+}
+.event strong {
+  font-size: 1.1rem;
+  color: #ffeb3b;
+}
+
+/* Mobile Optimization */
 @media (max-width: 600px) {
-  .hero-title {
-    font-size: 1.8rem;
-  }
-  .hero-greeting {
-    font-size: 1rem;
-  }
-  .login-input {
-    width: 100%;
+  .event {
+    width: 95%;
   }
 }

@@ -4,28 +4,21 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SuperGlassmireMediaServer Status</title>
-  <!-- Optional: Google Fonts for modern look -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link 
     href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" 
     rel="stylesheet"
   >
-  <!-- Link to our custom CSS -->
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-
-  <!-- HERO Section -->
   <header class="hero">
     <h1 class="hero-title">Welcome Friends!</h1>
-    <!-- Dynamic greeting goes here -->
     <p id="welcome-message" class="hero-greeting"></p>
   </header>
 
-  <!-- Container for any falling effects (snowflakes, bats, confetti, etc.) -->
   <div id="falling-effects-container"></div>
 
-  <!-- LOGIN Section -->
   <section class="login-section">
     <div class="login-container">
       <form id="loginForm" class="login-form">
@@ -40,14 +33,17 @@
         <button type="submit" class="login-button">Login</button>
       </form>
       <div id="status-area" class="status-area">
-  <h3>Plex Server Status</h3>
-  <p id="plex-status">Status: <span class="status-placeholder">Loading...</span></p>
-</div>
+        <h3>Server Status</h3>
+        <p id="uptime-status">Loading...</p>
+      </div>
     </div>
   </section>
-  
 
-  <!-- Load our script AFTER the DOM is ready (using defer) -->
+  <section id="calendar-section" class="calendar-section" style="display: none;">
+    <h3>Upcoming Releases</h3>
+    <div id="calendar-container" class="calendar-container"></div>
+  </section>
+
   <script src="js/script.js" defer></script>
 </body>
 </html>
