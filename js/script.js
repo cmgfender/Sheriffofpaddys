@@ -44,7 +44,7 @@ async function updateUptimeStatus() {
 }
 
 /*****************************************************
- * LOAD AND DISPLAY CALENDAR EVENTS
+ * LOAD AND DISPLAY CALENDAR EVENTS FROM AARS
  *****************************************************/
 async function loadCalendarEvents() {
   const calendarContainer = document.getElementById("calendar-container");
