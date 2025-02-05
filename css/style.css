@@ -29,7 +29,7 @@ body {
   font-weight: bold;
 }
 
-/* Calendar Events Display */
+/* Calendar Events */
 .calendar-container {
   display: flex;
   flex-direction: column;
