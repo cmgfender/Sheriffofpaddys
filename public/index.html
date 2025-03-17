@@ -71,11 +71,10 @@
             throw new Error("API response is not an array");
           }
 
-          // Update: TV shows event title is now just the series title and episode number (E1, E2, etc.)
+          // For Sonarr events, use the series title (from show.series.title) plus the episode number.
           const sonarrEvents = sonarrResponse.map(show => {
-            console.log("Sonarr show object:", show);
-            // Fallback: Use show.series.title if available, otherwise try show.title or "Unknown Title"
-            const seriesTitle = (show.series && show.series.title) ? show.series.title : (show.title || "Unknown Title");
+            // Here we assume that the Sonarr API returns the series info under "series"
+            const seriesTitle = (show.series && show.series.title) ? show.series.title : "Unknown Series";
             return {
               title: seriesTitle + " E" + show.episodeNumber,
               start: show.airDateUtc,
