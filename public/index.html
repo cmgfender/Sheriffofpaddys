@@ -40,10 +40,10 @@
             });
             calendar.render();
         
-            // Ensure the URLs match your main domain
-            const BASE_URL = "https://sheriffofpaddys.com"; // Change if you use www
-            const SONARR_PROXY_URL = `${BASE_URL}/proxy.php?service=sonarr`;
-            const RADARR_PROXY_URL = `${BASE_URL}/proxy.php?service=radarr`;
+            // Use Vercel API as a proxy
+            const BASE_URL = "https://www.sheriffofpaddys.com/api/proxy"; // Ensure correct domain
+            const SONARR_PROXY_URL = `${BASE_URL}?service=sonarr`;
+            const RADARR_PROXY_URL = `${BASE_URL}?service=radarr`;
         
             async function fetchReleases() {
                 try {
