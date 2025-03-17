@@ -25,7 +25,7 @@ export default async function handler(req, res) {
     let apiUrl = "";
     if (service === "sonarr") {
       // Use Sonarr's calendar API with the API key and the date range
-      apiUrl = `${SONARR_API_BASE}?apikey=7134e36b80f644aaa872f2bbd4fc1c22&start=${start}&end=${end}`;
+      apiUrl = `${SONARR_API_BASE}?apikey=7134e36b80f644aaa872f2bbd4fc1c22&start=${start}&end=${end}&includeSeries=true`;
     } else if (service === "radarr") {
       // If Radarr supports similar query parameters for date ranges, include them as well.
       // Otherwise, you might omit the start/end parameters.
