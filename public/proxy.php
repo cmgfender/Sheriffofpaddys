@@ -1,17 +1,24 @@
 <?php
-// Allow all domains to access this script
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json");
-header("Access-Control-Allow-Methods: GET, OPTIONS");
-header("Access-Control-Allow-Headers: Authorization, Content-Type");
-
-// API URLs for Sonarr and Radarr
-$sonarr_url = "http://172.17.0.14:8989/api/v3/calendar?apikey=7134e36b80f644aaa872f2bbd4fc1c22";
-$radarr_url = "http://172.17.0.10:7878/api/v3/calendar?apikey=54af0e9ea31d4b47b28c2984d0f7846c";
-
-// Determine which service to fetch
+// Get the requested service from the URL
 $service = isset($_GET['service']) ? $_GET['service'] : '';
 
+// Set correct CORS headers
+header("Access-Control-Allow-Origin: https://sheriffofpaddys.com");  // Use your main domain
+header("Access-Control-Allow-Methods: GET, OPTIONS");
+header("Access-Control-Allow-Headers: Authorization, Content-Type");
+header("Access-Control-Allow-Credentials: true");
+
+// Handle preflight requests
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    http_response_code(204);
+    exit;
+}
+
+// API URLs
+$sonarr_url = "http://172.17.0.14:8989/api/v3/calendar?apikey=YOUR_SONARR_API_KEY";
+$radarr_url = "http://172.17.0.10:7878/api/v3/calendar?apikey=YOUR_RADARR_API_KEY";
+
+// Choose API based on service parameter
 if ($service === "sonarr") {
     $api_url = $sonarr_url;
 } elseif ($service === "radarr") {
@@ -22,8 +29,18 @@ if ($service === "sonarr") {
 }
 
 // Fetch API Data
-$response = file_get_contents($api_url);
+$options = [
+    "http" => [
+        "header" => "User-Agent: PHP Proxy"
+    ]
+];
+$context = stream_context_create($options);
+$response = file_get_contents($api_url, false, $context);
 
-// Return API response
-echo $response;
+// Ensure proper response headers
+if ($response === FALSE) {
+    echo json_encode(["error" => "Failed to fetch data"]);
+} else {
+    echo $response;
+}
 ?>

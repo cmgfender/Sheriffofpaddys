@@ -39,36 +39,37 @@
                 events: [],
             });
             calendar.render();
-
-            // Proxy URLs for Sonarr & Radarr
-            const SONARR_PROXY_URL = "https://sheriffofpaddys.com/proxy.php?service=sonarr";
-            const RADARR_PROXY_URL = "https://sheriffofpaddys.com/proxy.php?service=radarr";
-
+        
+            // Ensure the URLs match your main domain
+            const BASE_URL = "https://sheriffofpaddys.com"; // Change if you use www
+            const SONARR_PROXY_URL = `${BASE_URL}/proxy.php?service=sonarr`;
+            const RADARR_PROXY_URL = `${BASE_URL}/proxy.php?service=radarr`;
+        
             async function fetchReleases() {
                 try {
                     const [sonarrResponse, radarrResponse] = await Promise.all([
                         fetch(SONARR_PROXY_URL).then(res => res.json()),
                         fetch(RADARR_PROXY_URL).then(res => res.json())
                     ]);
-
+        
                     const sonarrEvents = sonarrResponse.map(show => ({
                         title: show.series.title + " - S" + show.seasonNumber + "E" + show.episodeNumber,
                         start: show.airDateUtc,
-                        color: "#2196F3", // Blue for Sonarr
+                        color: "#2196F3",
                     }));
-
+        
                     const radarrEvents = radarrResponse.map(movie => ({
                         title: movie.title,
                         start: movie.inCinemas ? movie.inCinemas : movie.digitalRelease,
-                        color: "#E91E63", // Pink for Radarr
+                        color: "#E91E63",
                     }));
-
+        
                     calendar.addEventSource([...sonarrEvents, ...radarrEvents]);
                 } catch (error) {
                     console.error("Error fetching data:", error);
                 }
             }
-
+        
             fetchReleases();
         });
     </script>
