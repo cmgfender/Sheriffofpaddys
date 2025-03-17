@@ -4,19 +4,27 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Enhanced Media Release Calendar</title>
-  <!-- FullCalendar CSS/JS -->
+
+  <!-- FullCalendar Core + Plugins -->
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
+  <!-- You need this for the list view plugin: -->
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales-all.min.js"></script>
+  <!-- (Optional) If you’re using separate plugin files, you’d add them like:
+      <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/daygrid/main.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/list/main.min.js"></script>
+  -->
+
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
   <style>
     /* Base styles */
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
       margin: 0;
       padding: 0;
       background-color: #f4f4f4;
       color: #333;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
     }
 
     /* Page container */
@@ -29,6 +37,7 @@
 
     h1 {
       margin-top: 20px;
+      font-size: 1.8rem;
     }
 
     /* Calendar container */
@@ -81,47 +90,67 @@
       .fc .fc-toolbar-title {
         font-size: 1.2rem;
       }
+      .fc .fc-daygrid-event {
+        font-size: 0.85rem;
+      }
+      /* Adjust FullCalendar’s toolbar for smaller screens */
+      .fc-header-toolbar {
+        flex-wrap: wrap;
+      }
+      .fc-header-toolbar .fc-toolbar-chunk {
+        margin-bottom: 10px;
+      }
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <h1>Upcoming Media Releases</h1>
     <p class="error-message" id="errorMessage" style="display: none;"></p>
-    
+
     <div id="calendar"></div>
   </div>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function() {
       const calendarEl = document.getElementById("calendar");
       const errorMessage = document.getElementById("errorMessage");
-      
+
       // Initialize FullCalendar
       const calendar = new FullCalendar.Calendar(calendarEl, {
+        // Include the plugins you’re actually using; 
+        // The main script might already contain them, 
+        // but for clarity you can specify them:
+        // plugins: [ 'dayGrid', 'list' ],
         initialView: "dayGridMonth",
         headerToolbar: {
           left: "prev,next today",
           center: "title",
-          right: "dayGridMonth,timeGridWeek,timeGridDay"
+          // Provide the dayGrid and list view options
+          right: "dayGridMonth,listWeek"
         },
-        // Limit the number of events before "+ more" link appears
         dayMaxEventRows: 3,
-        // Show a custom message on the "+ more" link
-        moreLinkContent: function(args) {
-          return `+ ${args.num} more`;
+        moreLinkContent: (args) => `+ ${args.num} more`,
+        
+        // RESPONSIVE CHANGE: switch to list view under 600px
+        windowResize: function(view) {
+          if (window.innerWidth < 600 && view.type !== "listWeek") {
+            calendar.changeView("listWeek");
+          } else if (window.innerWidth >= 600 && view.type !== "dayGridMonth") {
+            calendar.changeView("dayGridMonth");
+          }
         },
-        events: [], // We’ll add events dynamically
 
-        // Tooltip handling:
-        // Attach the title as an inline tooltip that appears on hover.
+        // Simple tooltip on hover
         eventDidMount: function(info) {
           const tooltipEl = document.createElement("div");
           tooltipEl.classList.add("fc-tooltip");
-          // Show more details if you'd like; below is a simple approach
           tooltipEl.innerHTML = info.event.title;
           info.el.appendChild(tooltipEl);
-        }
+        },
+        
+        events: [] // We'll add events dynamically
       });
 
       calendar.render();
@@ -173,6 +202,9 @@
 
           // Add both sets to the calendar
           calendar.addEventSource([...sonarrEvents, ...radarrEvents]);
+
+          // Trigger a resize check so the calendar picks the right view
+          calendar.updateSize();
         } catch (error) {
           console.error("Error fetching data:", error);
           errorMessage.style.display = "block";
