@@ -25,51 +25,72 @@
             border-radius: 8px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
         }
+        .error-message {
+            color: red;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
     <h1>Upcoming Media Releases</h1>
+    <p class="error-message" id="errorMessage" style="display: none;"></p>
     <div id="calendar"></div>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const calendarEl = document.getElementById("calendar");
+            const errorMessage = document.getElementById("errorMessage");
             const calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: "dayGridMonth",
                 events: [],
             });
             calendar.render();
-        
+
             // Use Vercel API as a proxy
             const BASE_URL = "https://www.sheriffofpaddys.com/api/proxy"; // Ensure correct domain
             const SONARR_PROXY_URL = `${BASE_URL}?service=sonarr`;
             const RADARR_PROXY_URL = `${BASE_URL}?service=radarr`;
-        
+
             async function fetchReleases() {
                 try {
                     const [sonarrResponse, radarrResponse] = await Promise.all([
-                        fetch(SONARR_PROXY_URL).then(res => res.json()),
-                        fetch(RADARR_PROXY_URL).then(res => res.json())
+                        fetch(SONARR_PROXY_URL).then(res => {
+                            if (!res.ok) throw new Error(`Sonarr API Error: ${res.status}`);
+                            return res.json();
+                        }),
+                        fetch(RADARR_PROXY_URL).then(res => {
+                            if (!res.ok) throw new Error(`Radarr API Error: ${res.status}`);
+                            return res.json();
+                        })
                     ]);
-        
+
+                    console.log("Sonarr Data:", sonarrResponse);
+                    console.log("Radarr Data:", radarrResponse);
+
+                    if (!Array.isArray(sonarrResponse) || !Array.isArray(radarrResponse)) {
+                        throw new Error("API response is not an array");
+                    }
+
                     const sonarrEvents = sonarrResponse.map(show => ({
                         title: show.series.title + " - S" + show.seasonNumber + "E" + show.episodeNumber,
                         start: show.airDateUtc,
                         color: "#2196F3",
                     }));
-        
+
                     const radarrEvents = radarrResponse.map(movie => ({
                         title: movie.title,
                         start: movie.inCinemas ? movie.inCinemas : movie.digitalRelease,
                         color: "#E91E63",
                     }));
-        
+
                     calendar.addEventSource([...sonarrEvents, ...radarrEvents]);
                 } catch (error) {
                     console.error("Error fetching data:", error);
+                    errorMessage.style.display = "block";
+                    errorMessage.textContent = "Failed to load calendar data. Check console for details.";
                 }
             }
-        
+
             fetchReleases();
         });
     </script>

@@ -1,7 +1,7 @@
 export default async function handler(req, res) {
     const { service } = req.query;
 
-    // CORS Headers
+    // Set CORS Headers
     res.setHeader("Access-Control-Allow-Origin", "https://www.sheriffofpaddys.com");
     res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
@@ -13,8 +13,8 @@ export default async function handler(req, res) {
     }
 
     // API URLs for Sonarr and Radarr
-    const SONARR_API = "http://172.17.0.14:8989/api/v3/calendar?apikey=YOUR_SONARR_API_KEY";
-    const RADARR_API = "http://172.17.0.10:7878/api/v3/calendar?apikey=YOUR_RADARR_API_KEY";
+    const SONARR_API = "https://sonarr.sheriffofpaddys.com/api/v3/calendar?apikey=7134e36b80f644aaa872f2bbd4fc1c22";
+    const RADARR_API = "https://radarr.sheriffofpaddys.com/api/v3/calendar?apikey=54af0e9ea31d4b47b28c2984d0f7846c";
 
     let apiUrl = "";
     if (service === "sonarr") {
@@ -29,10 +29,10 @@ export default async function handler(req, res) {
         const response = await fetch(apiUrl);
         const contentType = response.headers.get("content-type");
 
-        // Ensure response is JSON
+        // Ensure the response is JSON
         if (!contentType || !contentType.includes("application/json")) {
             console.error("Received non-JSON response:", await response.text());
-            throw new Error("Invalid response type (not JSON)");
+            return res.status(500).json({ error: "API returned an invalid response (not JSON)" });
         }
 
         const data = await response.json();
