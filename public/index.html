@@ -3,22 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Enhanced Media Release Calendar</title>
+  <title>Advanced Media Release Calendar</title>
 
-  <!-- FullCalendar Core + Plugins -->
+  <!-- FullCalendar CSS -->
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
-  <!-- You need this for the list view plugin: -->
+  
+  <!-- FullCalendar JS (core + dayGrid + list plugins, and optionally bootstrap if you prefer that style) -->
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales-all.min.js"></script>
-  <!-- (Optional) If you’re using separate plugin files, you’d add them like:
-      <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/daygrid/main.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/list/main.min.js"></script>
+  <!-- If you want the “list” views as separate modules, you’d also add:
+       <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/list/main.min.js"></script>
+       etc.
   -->
 
+  <!-- Axios (optional if you want) -->
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-
+  
   <style>
-    /* Base styles */
+    /* Base page styles */
     body {
       margin: 0;
       padding: 0;
@@ -27,21 +29,20 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
     }
 
-    /* Page container */
     .container {
       max-width: 1200px;
       margin: 0 auto;
       padding: 0 20px;
-      text-align: center;
     }
 
     h1 {
-      margin-top: 20px;
+      margin: 20px 0;
+      text-align: center;
       font-size: 1.8rem;
     }
 
     /* Calendar container */
-    #calendar {
+    #calendarContainer {
       max-width: 100%;
       margin: 20px auto;
       background: #fff;
@@ -50,11 +51,37 @@
       box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
     }
 
-    /* Error message */
     .error-message {
       color: red;
       font-weight: bold;
       margin-top: 20px;
+      text-align: center;
+    }
+
+    /* Loading spinner overlay */
+    #loadingOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.3);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      display: none; /* hidden by default */
+    }
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border: 6px solid #ccc;
+      border-top: 6px solid #2196F3;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to {transform: rotate(360deg);}
     }
 
     /* Tooltip styles */
@@ -79,12 +106,48 @@
       display: block;
     }
 
+    /* Modal for event details */
+    #eventModal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0px 2px 10px rgba(0,0,0,0.3);
+      z-index: 10000;
+      display: none;
+      max-width: 90%;
+      max-height: 80%;
+      overflow-y: auto;
+    }
+    #modalClose {
+      float: right;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    /* Optional search box for filtering events */
+    .search-container {
+      margin: 0 auto;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .search-container input {
+      font-size: 1rem;
+      padding: 5px 10px;
+      width: 240px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+
     /* Responsive tweaks */
     @media (max-width: 600px) {
       .container {
         padding: 0 10px;
       }
-      #calendar {
+      #calendarContainer {
         padding: 10px;
       }
       .fc .fc-toolbar-title {
@@ -93,7 +156,6 @@
       .fc .fc-daygrid-event {
         font-size: 0.85rem;
       }
-      /* Adjust FullCalendar’s toolbar for smaller screens */
       .fc-header-toolbar {
         flex-wrap: wrap;
       }
@@ -105,35 +167,81 @@
 </head>
 
 <body>
+  <!-- Loading overlay with spinner -->
+  <div id="loadingOverlay">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Optional modal for event details -->
+  <div id="eventModal">
+    <span id="modalClose">&times;</span>
+    <h2 id="modalTitle"></h2>
+    <p id="modalDate"></p>
+    <p id="modalAdditional"></p>
+  </div>
+
   <div class="container">
     <h1>Upcoming Media Releases</h1>
-    <p class="error-message" id="errorMessage" style="display: none;"></p>
+    
+    <p id="errorMessage" class="error-message" style="display: none;"></p>
 
-    <div id="calendar"></div>
+    <!-- Optional search box for filtering events -->
+    <div class="search-container">
+      <input 
+        type="text" 
+        id="searchInput" 
+        placeholder="Search events..." 
+        oninput="filterEvents()" 
+      />
+    </div>
+
+    <div id="calendarContainer">
+      <div id="calendar"></div>
+    </div>
   </div>
 
   <script>
+    let calendar; // we'll store the calendar instance here
+    let allEvents = []; // store a reference to all events for searching/filtering
+    let isFetching = false;
+
+    // Utility function to format date/time for tooltip or modal
+    function formatDateString(dateStr) {
+      // You can use built-in JS or a library like moment.js/dayjs
+      // For a quick approach:
+      const d = new Date(dateStr);
+      if (isNaN(d)) return "Unknown Date";
+      return d.toLocaleString(); // e.g. "3/17/2025, 2:58:00 PM"
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
       const calendarEl = document.getElementById("calendar");
       const errorMessage = document.getElementById("errorMessage");
 
+      // Show or hide the loading spinner
+      function setLoading(state) {
+        document.getElementById("loadingOverlay").style.display = state ? "flex" : "none";
+      }
+
       // Initialize FullCalendar
-      const calendar = new FullCalendar.Calendar(calendarEl, {
-        // Include the plugins you’re actually using; 
-        // The main script might already contain them, 
-        // but for clarity you can specify them:
-        // plugins: [ 'dayGrid', 'list' ],
+      calendar = new FullCalendar.Calendar(calendarEl, {
+        // If you prefer a bootstrap look, you can do:
+        // themeSystem: 'bootstrap',
+        // initialView: 'dayGridMonth', 
+        // etc.
+
         initialView: "dayGridMonth",
         headerToolbar: {
           left: "prev,next today",
           center: "title",
-          // Provide the dayGrid and list view options
-          right: "dayGridMonth,listWeek"
+          right: "dayGridMonth,listWeek,timeGridDay"
         },
+        
+        // Limit events visible in each day cell
         dayMaxEventRows: 3,
         moreLinkContent: (args) => `+ ${args.num} more`,
-        
-        // RESPONSIVE CHANGE: switch to list view under 600px
+
+        // Switch to list view on small screens
         windowResize: function(view) {
           if (window.innerWidth < 600 && view.type !== "listWeek") {
             calendar.changeView("listWeek");
@@ -142,25 +250,36 @@
           }
         },
 
-        // Simple tooltip on hover
+        // Provide a basic mouse-over tooltip
         eventDidMount: function(info) {
           const tooltipEl = document.createElement("div");
           tooltipEl.classList.add("fc-tooltip");
-          tooltipEl.innerHTML = info.event.title;
+          const dateStr = formatDateString(info.event.start);
+          tooltipEl.innerHTML = `${info.event.title}<br><small>${dateStr}</small>`;
           info.el.appendChild(tooltipEl);
         },
+
+        // Optional: click event to open a modal
+        eventClick: function(info) {
+          info.jsEvent.preventDefault();
+          openModalForEvent(info.event);
+        },
         
-        events: [] // We'll add events dynamically
+        events: []
       });
 
       calendar.render();
 
-      // Use Vercel API as a proxy
-      const BASE_URL = "https://www.sheriffofpaddys.com/api/proxy"; // Ensure this is correct
+      // Use your Vercel proxy (or any other) for data
+      const BASE_URL = "https://www.sheriffofpaddys.com/api/proxy"; 
       const SONARR_PROXY_URL = `${BASE_URL}?service=sonarr`;
       const RADARR_PROXY_URL = `${BASE_URL}?service=radarr`;
 
       async function fetchReleases() {
+        if (isFetching) return;
+        isFetching = true;
+        setLoading(true);
+        
         try {
           const [sonarrResponse, radarrResponse] = await Promise.all([
             fetch(SONARR_PROXY_URL).then(res => {
@@ -182,38 +301,89 @@
 
           // Sonarr Events: [Series Title] - S[seasonNumber]E[episodeNumber]
           const sonarrEvents = sonarrResponse.map(show => {
-            const seriesTitle = show.seriesTitle 
-              || (show.series && show.series.title) 
-              || show.title 
-              || "Unknown Title";
+            const seriesTitle =
+              show.seriesTitle ||
+              (show.series && show.series.title) ||
+              show.title ||
+              "Unknown Title";
+
             return {
+              id: `sonarr-${show.id || Math.random()}`, // ensures a unique ID
               title: `${seriesTitle} - S${show.seasonNumber}E${show.episodeNumber}`,
               start: show.airDateUtc,
-              color: "#2196F3"
+              color: "#2196F3",
+              extendedProps: {
+                type: "tv", 
+                season: show.seasonNumber,
+                episode: show.episodeNumber
+              }
             };
           });
 
           // Radarr Events: movie title on digital release date
           const radarrEvents = radarrResponse.map(movie => ({
+            id: `radarr-${movie.id || Math.random()}`, 
             title: movie.title,
             start: movie.digitalRelease,
-            color: "#E91E63"
+            color: "#E91E63",
+            extendedProps: {
+              type: "movie",
+              originalRelease: movie.inCinemas,
+              // add any other relevant fields
+            }
           }));
 
-          // Add both sets to the calendar
-          calendar.addEventSource([...sonarrEvents, ...radarrEvents]);
+          // Combine events & store for filtering
+          allEvents = [...sonarrEvents, ...radarrEvents];
 
-          // Trigger a resize check so the calendar picks the right view
+          // Add them to the calendar
+          calendar.addEventSource(allEvents);
+
+          // Force a resize check for correct initial view
           calendar.updateSize();
         } catch (error) {
           console.error("Error fetching data:", error);
           errorMessage.style.display = "block";
           errorMessage.textContent = "Failed to load calendar data. Check console for details.";
+        } finally {
+          setLoading(false);
+          isFetching = false;
         }
       }
 
       fetchReleases();
+
+      // Simple modal handling
+      const eventModal = document.getElementById("eventModal");
+      const modalClose = document.getElementById("modalClose");
+      modalClose.addEventListener("click", () => {
+        eventModal.style.display = "none";
+      });
+      function openModalForEvent(event) {
+        document.getElementById("modalTitle").textContent = event.title;
+        document.getElementById("modalDate").textContent = formatDateString(event.start);
+        document.getElementById("modalAdditional").textContent = 
+          `Type: ${event.extendedProps.type || "N/A"}`;
+        eventModal.style.display = "block";
+      }
     });
+
+    // Optional search function to filter events in real-time
+    function filterEvents() {
+      const query = document.getElementById("searchInput").value.toLowerCase().trim();
+      
+      // For best performance, we can remove the existing events and re-add filtered ones
+      calendar.getEventSources().forEach(source => source.remove());
+      
+      if (!query) {
+        // If no search query, show all
+        calendar.addEventSource(allEvents);
+      } else {
+        // Filter and only show matching events
+        const filtered = allEvents.filter(evt => evt.title.toLowerCase().includes(query));
+        calendar.addEventSource(filtered);
+      }
+    }
   </script>
 </body>
 </html>
