@@ -11,7 +11,7 @@ export default async function handler(req, res) {
     if (req.method === "OPTIONS") {
         return res.status(204).end();
     }
-
+    
     // API URLs for Sonarr and Radarr
     const SONARR_API = "https://sonarr.sheriffofpaddys.com/api/v3/calendar?apikey=7134e36b80f644aaa872f2bbd4fc1c22";
     const RADARR_API = "https://radarr.sheriffofpaddys.com/api/v3/calendar?apikey=54af0e9ea31d4b47b28c2984d0f7846c";
@@ -29,10 +29,15 @@ export default async function handler(req, res) {
         const response = await fetch(apiUrl);
         const contentType = response.headers.get("content-type");
 
-        // Ensure the response is JSON
+        if (!response.ok) {
+            console.error(`API Error: ${response.status} - ${await response.text()}`);
+            return res.status(response.status).json({ error: `API Error: ${response.status}` });
+        }
+
         if (!contentType || !contentType.includes("application/json")) {
-            console.error("Received non-JSON response:", await response.text());
-            return res.status(500).json({ error: "API returned an invalid response (not JSON)" });
+            const textResponse = await response.text();
+            console.error("Non-JSON Response:", textResponse);
+            return res.status(500).json({ error: "Invalid response type (not JSON)", response: textResponse });
         }
 
         const data = await response.json();
