@@ -82,9 +82,10 @@
             };
           });
 
+          // Update: Only use the digital release date for Radarr movies.
           const radarrEvents = radarrResponse.map(movie => ({
             title: movie.title,
-            start: movie.inCinemas ? movie.inCinemas : movie.digitalRelease,
+            start: movie.digitalRelease,
             color: "#E91E63",
           }));
 
