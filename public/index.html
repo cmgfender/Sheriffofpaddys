@@ -71,11 +71,13 @@
             throw new Error("API response is not an array");
           }
 
-          // For Sonarr events, use seriesTitle directly from the API response plus the episode number.
+          // Use the original naming format:
+          // [Series Title] - S[seasonNumber]E[episodeNumber]
           const sonarrEvents = sonarrResponse.map(show => {
-            const seriesTitle = show.seriesTitle || "Unknown Series";
+            // Attempt to use seriesTitle; if not available, check nested series.title; otherwise fall back to show.title.
+            const seriesTitle = show.seriesTitle || (show.series && show.series.title) || show.title || "Unknown Title";
             return {
-              title: `${seriesTitle} E${show.episodeNumber}`,
+              title: `${seriesTitle} - S${show.seasonNumber}E${show.episodeNumber}`,
               start: show.airDateUtc,
               color: "#2196F3",
             };
