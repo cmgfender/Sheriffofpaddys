@@ -1,98 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Media Release Calendar Test</title>
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            text-align: center;
-            background-color: #f4f4f4;
-        }
-        h1 {
-            color: #333;
-        }
-        #calendar {
-            max-width: 900px;
-            margin: 20px auto;
-            background: #fff;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        }
-        .error-message {
-            color: red;
-            font-weight: bold;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Media Release Calendar Test</title>
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      text-align: center;
+      background-color: #f4f4f4;
+    }
+    h1 {
+      color: #333;
+    }
+    #calendar {
+      max-width: 900px;
+      margin: 20px auto;
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+    .error-message {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-    <h1>Upcoming Media Releases</h1>
-    <p class="error-message" id="errorMessage" style="display: none;"></p>
-    <div id="calendar"></div>
+  <h1>Upcoming Media Releases</h1>
+  <p class="error-message" id="errorMessage" style="display: none;"></p>
+  <div id="calendar"></div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const calendarEl = document.getElementById("calendar");
-            const errorMessage = document.getElementById("errorMessage");
-            const calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: "dayGridMonth",
-                events: [],
-            });
-            calendar.render();
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const calendarEl = document.getElementById("calendar");
+      const errorMessage = document.getElementById("errorMessage");
+      const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: "dayGridMonth",
+        events: [],
+      });
+      calendar.render();
 
-            // Use Vercel API as a proxy
-            const BASE_URL = "https://www.sheriffofpaddys.com/api/proxy"; // Ensure correct domain
-            const SONARR_PROXY_URL = `${BASE_URL}?service=sonarr`;
-            const RADARR_PROXY_URL = `${BASE_URL}?service=radarr`;
+      // Use Vercel API as a proxy
+      const BASE_URL = "https://www.sheriffofpaddys.com/api/proxy"; // Ensure this is the correct domain
+      const SONARR_PROXY_URL = `${BASE_URL}?service=sonarr`;
+      const RADARR_PROXY_URL = `${BASE_URL}?service=radarr`;
 
-            async function fetchReleases() {
-                try {
-                    const [sonarrResponse, radarrResponse] = await Promise.all([
-                        fetch(SONARR_PROXY_URL).then(res => {
-                            if (!res.ok) throw new Error(`Sonarr API Error: ${res.status}`);
-                            return res.json();
-                        }),
-                        fetch(RADARR_PROXY_URL).then(res => {
-                            if (!res.ok) throw new Error(`Radarr API Error: ${res.status}`);
-                            return res.json();
-                        })
-                    ]);
+      async function fetchReleases() {
+        try {
+          const [sonarrResponse, radarrResponse] = await Promise.all([
+            fetch(SONARR_PROXY_URL).then(res => {
+              if (!res.ok) throw new Error(`Sonarr API Error: ${res.status}`);
+              return res.json();
+            }),
+            fetch(RADARR_PROXY_URL).then(res => {
+              if (!res.ok) throw new Error(`Radarr API Error: ${res.status}`);
+              return res.json();
+            })
+          ]);
 
-                    console.log("Sonarr Data:", sonarrResponse);
-                    console.log("Radarr Data:", radarrResponse);
+          console.log("Sonarr Data:", sonarrResponse);
+          console.log("Radarr Data:", radarrResponse);
 
-                    if (!Array.isArray(sonarrResponse) || !Array.isArray(radarrResponse)) {
-                        throw new Error("API response is not an array");
-                    }
+          if (!Array.isArray(sonarrResponse) || !Array.isArray(radarrResponse)) {
+            throw new Error("API response is not an array");
+          }
 
-                    const sonarrEvents = sonarrResponse.map(show => ({
-                        title: show.series.title + " - S" + show.seasonNumber + "E" + show.episodeNumber,
-                        start: show.airDateUtc,
-                        color: "#2196F3",
-                    }));
+          const sonarrEvents = sonarrResponse.map(show => {
+            console.log("Sonarr show object:", show);
+            // Fallback: Use show.series.title if available, otherwise try show.title or "Unknown Title"
+            const seriesTitle = (show.series && show.series.title) ? show.series.title : (show.title || "Unknown Title");
+            return {
+              title: seriesTitle + " - S" + show.seasonNumber + "E" + show.episodeNumber,
+              start: show.airDateUtc,
+              color: "#2196F3",
+            };
+          });
 
-                    const radarrEvents = radarrResponse.map(movie => ({
-                        title: movie.title,
-                        start: movie.inCinemas ? movie.inCinemas : movie.digitalRelease,
-                        color: "#E91E63",
-                    }));
+          const radarrEvents = radarrResponse.map(movie => ({
+            title: movie.title,
+            start: movie.inCinemas ? movie.inCinemas : movie.digitalRelease,
+            color: "#E91E63",
+          }));
 
-                    calendar.addEventSource([...sonarrEvents, ...radarrEvents]);
-                } catch (error) {
-                    console.error("Error fetching data:", error);
-                    errorMessage.style.display = "block";
-                    errorMessage.textContent = "Failed to load calendar data. Check console for details.";
-                }
-            }
+          calendar.addEventSource([...sonarrEvents, ...radarrEvents]);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+          errorMessage.style.display = "block";
+          errorMessage.textContent = "Failed to load calendar data. Check console for details.";
+        }
+      }
 
-            fetchReleases();
-        });
-    </script>
+      fetchReleases();
+    });
+  </script>
 </body>
 </html>
