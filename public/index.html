@@ -2,52 +2,132 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Media Release Calendar Test</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Enhanced Media Release Calendar</title>
+  <!-- FullCalendar CSS/JS -->
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
   <style>
+    /* Base styles */
     body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      text-align: center;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      margin: 0;
+      padding: 0;
       background-color: #f4f4f4;
-    }
-    h1 {
       color: #333;
     }
+
+    /* Page container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      text-align: center;
+    }
+
+    h1 {
+      margin-top: 20px;
+    }
+
+    /* Calendar container */
     #calendar {
-      max-width: 900px;
+      max-width: 100%;
       margin: 20px auto;
       background: #fff;
       padding: 15px;
       border-radius: 8px;
       box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
     }
+
+    /* Error message */
     .error-message {
       color: red;
       font-weight: bold;
+      margin-top: 20px;
+    }
+
+    /* Tooltip styles */
+    .fc-event {
+      position: relative;
+      cursor: pointer;
+    }
+    .fc-tooltip {
+      position: absolute;
+      background: #212121;
+      color: #fff;
+      padding: 5px 8px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -100%);
+      white-space: nowrap;
+      display: none;
+    }
+    .fc-event:hover .fc-tooltip {
+      display: block;
+    }
+
+    /* Responsive tweaks */
+    @media (max-width: 600px) {
+      .container {
+        padding: 0 10px;
+      }
+      #calendar {
+        padding: 10px;
+      }
+      .fc .fc-toolbar-title {
+        font-size: 1.2rem;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>Upcoming Media Releases</h1>
-  <p class="error-message" id="errorMessage" style="display: none;"></p>
-  <div id="calendar"></div>
+  <div class="container">
+    <h1>Upcoming Media Releases</h1>
+    <p class="error-message" id="errorMessage" style="display: none;"></p>
+    
+    <div id="calendar"></div>
+  </div>
 
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       const calendarEl = document.getElementById("calendar");
       const errorMessage = document.getElementById("errorMessage");
+      
+      // Initialize FullCalendar
       const calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: "dayGridMonth",
-        events: [],
+        headerToolbar: {
+          left: "prev,next today",
+          center: "title",
+          right: "dayGridMonth,timeGridWeek,timeGridDay"
+        },
+        // Limit the number of events before "+ more" link appears
+        dayMaxEventRows: 3,
+        // Show a custom message on the "+ more" link
+        moreLinkContent: function(args) {
+          return `+ ${args.num} more`;
+        },
+        events: [], // We’ll add events dynamically
+
+        // Tooltip handling:
+        // Attach the title as an inline tooltip that appears on hover.
+        eventDidMount: function(info) {
+          const tooltipEl = document.createElement("div");
+          tooltipEl.classList.add("fc-tooltip");
+          // Show more details if you'd like; below is a simple approach
+          tooltipEl.innerHTML = info.event.title;
+          info.el.appendChild(tooltipEl);
+        }
       });
+
       calendar.render();
 
       // Use Vercel API as a proxy
-      const BASE_URL = "https://www.sheriffofpaddys.com/api/proxy"; // Ensure this is the correct domain
+      const BASE_URL = "https://www.sheriffofpaddys.com/api/proxy"; // Ensure this is correct
       const SONARR_PROXY_URL = `${BASE_URL}?service=sonarr`;
       const RADARR_PROXY_URL = `${BASE_URL}?service=radarr`;
 
@@ -71,25 +151,27 @@
             throw new Error("API response is not an array");
           }
 
-          // Use the original naming format:
-          // [Series Title] - S[seasonNumber]E[episodeNumber]
+          // Sonarr Events: [Series Title] - S[seasonNumber]E[episodeNumber]
           const sonarrEvents = sonarrResponse.map(show => {
-            // Attempt to use seriesTitle; if not available, check nested series.title; otherwise fall back to show.title.
-            const seriesTitle = show.seriesTitle || (show.series && show.series.title) || show.title || "Unknown Title";
+            const seriesTitle = show.seriesTitle 
+              || (show.series && show.series.title) 
+              || show.title 
+              || "Unknown Title";
             return {
               title: `${seriesTitle} - S${show.seasonNumber}E${show.episodeNumber}`,
               start: show.airDateUtc,
-              color: "#2196F3",
+              color: "#2196F3"
             };
           });
 
-          // For Radarr events, only use the digital release date.
+          // Radarr Events: movie title on digital release date
           const radarrEvents = radarrResponse.map(movie => ({
             title: movie.title,
             start: movie.digitalRelease,
-            color: "#E91E63",
+            color: "#E91E63"
           }));
 
+          // Add both sets to the calendar
           calendar.addEventSource([...sonarrEvents, ...radarrEvents]);
         } catch (error) {
           console.error("Error fetching data:", error);
