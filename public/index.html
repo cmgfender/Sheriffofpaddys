@@ -71,10 +71,14 @@
             throw new Error("API response is not an array");
           }
 
-          // For Sonarr events, use seriesTitle plus episode number.
+          // For Sonarr events, determine the series title from multiple possible properties.
           const sonarrEvents = sonarrResponse.map(show => {
-            // Use show.seriesTitle (as provided by Sonarr v3 Calendar API) for the series name.
-            const seriesTitle = show.seriesTitle || "Unknown Series";
+            let seriesTitle = "Unknown Series";
+            if (typeof show.series === "string") {
+              seriesTitle = show.series;
+            } else if (show.series && show.series.title) {
+              seriesTitle = show.series.title;
+            }
             return {
               title: `${seriesTitle} E${show.episodeNumber}`,
               start: show.airDateUtc,
