@@ -52,7 +52,11 @@
     <div class="search-container">
       <input type="text" id="searchInput" placeholder="Search events..." oninput="filterEvents()" />
     </div>
-
+    <!-- UptimeKuma Section -->
+    <div id="uptimekuma-container">
+      <h2>Server Uptime</h2>
+      <pre id="uptimekuma-status">Loading Uptime info...</pre>
+    </div>
     <!-- CALENDAR -->
     <div id="calendarContainer">
       <div id="calendar"></div>
@@ -74,5 +78,6 @@
 
   <!-- Our custom JS -->
   <script src="public/script.js"></script>
+  <script src="public/uptimescript.js"></script>
 </body>
 </html>
