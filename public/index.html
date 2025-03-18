@@ -52,16 +52,16 @@
     <div class="search-container">
       <input type="text" id="searchInput" placeholder="Search events..." oninput="filterEvents()" />
     </div>
-    <!-- UptimeKuma Section -->
-    <div id="uptimekuma-container">
-      <h2>Server Uptime</h2>
-      <pre id="uptimekuma-status">Loading Uptime info...</pre>
-    </div>
+    
     <!-- CALENDAR -->
     <div id="calendarContainer">
       <div id="calendar"></div>
     </div>
-
+      <!-- Uptime Kuma Section (Moved to Bottom) -->
+      <div id="uptimekuma-container">
+        <h2>Server Uptime</h2>
+        <iframe src="https://uptime.sheriffofpaddys.com/status/all" width="100%" height="500px" frameborder="0"></iframe>
+      </div>
     <!-- FOOTER WITH ADDITIONAL LINKS -->
     <footer>
       <div class="footer-content">
@@ -72,6 +72,9 @@
           <li><a href="https://heimdall.sheriffofpaddys.com" target="_blank">Heimdall</a></li>
         </ul>
       </div>
+      
+
+      
       <p class="footer-note">&copy; 2025 Sheriff of Paddys. All rights reserved.</p>
     </footer>
   </div>
