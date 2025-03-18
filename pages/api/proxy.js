@@ -11,9 +11,15 @@ export default async function handler(req, res) {
   
     console.log(`🔹 Fetching data for: ${service}`);
   
-    // Compute the date range for three months of events
+    // Compute the date range from 1 month ago to 3 months from now
     const today = new Date();
-    const start = today.toISOString().split("T")[0]; // Format: YYYY-MM-DD
+
+    // 1 month earlier
+    const oneMonthAgo = new Date(today);
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+    const start = oneMonthAgo.toISOString().split("T")[0]; // format "YYYY-MM-DD"
+
+    // 3 months later
     const threeMonthsLater = new Date(today);
     threeMonthsLater.setMonth(threeMonthsLater.getMonth() + 3);
     const end = threeMonthsLater.toISOString().split("T")[0];
