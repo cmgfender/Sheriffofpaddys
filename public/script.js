@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", function() {
     if (isFetching) return;
     isFetching = true;
     setLoading(true);
-    
+
     try {
       const [sonarrResponse, radarrResponse] = await Promise.all([
         fetch(SONARR_PROXY_URL).then(res => {
@@ -83,30 +83,40 @@ document.addEventListener("DOMContentLoaded", function() {
       // Process Sonarr events
       const sonarrEvents = sonarrResponse.map(show => {
         const seriesTitle = show.seriesTitle || (show.series && show.series.title) || show.title || "Unknown Title";
+        const hasFile = show.hasFile === true;  // Check Sonarr's hasFile
         return {
           id: `sonarr-${show.id || Math.random()}`,
           title: `${seriesTitle} - S${show.seasonNumber}E${show.episodeNumber}`,
           start: show.airDateUtc,
-          color: "#2196F3",
+          // If hasFile is true, color events green, otherwise use your normal Sonarr color
+          color: hasFile ? "green" : "#2196F3",
           extendedProps: {
             type: "tv",
             season: show.seasonNumber,
-            episode: show.episodeNumber
+            episode: show.episodeNumber,
+            hasFile: hasFile,
+            overview: show.overview || "No overview available"
           }
         };
       });
 
       // Process Radarr events
-      const radarrEvents = radarrResponse.map(movie => ({
-        id: `radarr-${movie.id || Math.random()}`,
-        title: movie.title,
-        start: movie.digitalRelease,
-        color: "#E91E63",
-        extendedProps: {
-          type: "movie",
-          originalRelease: movie.inCinemas
-        }
-      }));
+      const radarrEvents = radarrResponse.map(movie => {
+        const hasFile = movie.hasFile === true; // Check Radarr's hasFile
+        return {
+          id: `radarr-${movie.id || Math.random()}`,
+          title: movie.title,
+          start: movie.digitalRelease,
+          // If hasFile is true, color events green, otherwise use your normal Radarr color
+          color: hasFile ? "green" : "#E91E63",
+          extendedProps: {
+            type: "movie",
+            originalRelease: movie.inCinemas,
+            hasFile: hasFile,
+            overview: movie.overview || "No overview available"
+          }
+        };
+      });
 
       // Combine and add events
       allEvents = [...sonarrEvents, ...radarrEvents];
@@ -130,10 +140,22 @@ document.addEventListener("DOMContentLoaded", function() {
   modalClose.addEventListener("click", () => {
     eventModal.style.display = "none";
   });
+
   function openModalForEvent(event) {
     document.getElementById("modalTitle").textContent = event.title;
     document.getElementById("modalDate").textContent = formatDateString(event.start);
-    document.getElementById("modalAdditional").textContent = `Type: ${event.extendedProps.type || "N/A"}`;
+
+    // Display extra details in the modal
+    const type = event.extendedProps.type || "N/A";
+    const hasFileText = event.extendedProps.hasFile ? "Yes" : "No";
+    const overview = event.extendedProps.overview || "No overview available";
+
+    // You can expand these fields further if you like
+    document.getElementById("modalAdditional").innerHTML = `
+      <strong>Type:</strong> ${type}<br>
+      <strong>Has File:</strong> ${hasFileText}<br>
+      <strong>Overview:</strong> ${overview}
+    `;
     eventModal.style.display = "block";
   }
 });
