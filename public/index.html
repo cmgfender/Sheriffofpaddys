@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Advanced Media Release Calendar</title>
 
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
   <!-- FullCalendar CSS -->
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
 
@@ -20,24 +23,24 @@
 </head>
 <body>
   <!-- LOGIN OVERLAY -->
-  <div id="loginOverlay">
+  <div id="loginOverlay" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
     <div id="loginForm">
-      <h2>Protected Page</h2>
+      <h2 id="loginTitle">Protected Page</h2>
       <p>Please enter the password to continue.</p>
       <input type="password" id="passwordInput" placeholder="Password" />
       <button onclick="checkPassword()">Login</button>
-      <div id="loginError">Incorrect password. Try again.</div>
+      <div id="loginError" role="alert">Incorrect password. Try again.</div>
     </div>
   </div>
 
   <!-- LOADING OVERLAY -->
-  <div id="loadingOverlay">
+  <div id="loadingOverlay" aria-hidden="true">
     <div class="spinner"></div>
   </div>
 
   <!-- EVENT MODAL -->
-  <div id="eventModal">
-    <span id="modalClose">&times;</span>
+  <div id="eventModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button id="modalClose" aria-label="Close">&times;</button>
     <h2 id="modalTitle"></h2>
     <p id="modalDate"></p>
     <p id="modalAdditional"></p>
@@ -45,23 +48,29 @@
 
   <!-- MAIN CONTENT (hidden until login) -->
   <div class="container" id="mainContainer">
-    <h1>Upcoming Media Releases</h1>
+    <header>
+      <h1>Upcoming Media Releases</h1>
+    </header>
     <p id="errorMessage" class="error-message" style="display: none;"></p>
 
     <!-- SEARCH BOX -->
     <div class="search-container">
-      <input type="text" id="searchInput" placeholder="Search events..." oninput="filterEvents()" />
+      <input type="text" id="searchInput" placeholder="Search events..." oninput="filterEvents()" aria-label="Search events" />
     </div>
     
     <!-- CALENDAR -->
-    <div id="calendarContainer">
+    <main id="calendarContainer">
       <div id="calendar"></div>
-    </div>
-      <!-- Uptime Kuma Section (Moved to Bottom) -->
-      <div id="uptimekuma-container">
-        <h2>Server Uptime</h2>
-        <iframe src="https://uptime.sheriffofpaddys.com/status/all" width="100%" height="500px" frameborder="0"></iframe>
-      </div>
+    </main>
+
+    <!-- Uptime Kuma Section -->
+    <section id="uptimekuma-container">
+      <h2>Server Uptime</h2>
+      <iframe src="https://uptime.sheriffofpaddys.com/status/all" width="100%" height="500px" frameborder="0" title="Server Uptime"></iframe>
+      <!-- Optional container for displaying uptime data fetched via proxy -->
+      <div id="uptimekuma-status" class="uptime-status"></div>
+    </section>
+
     <!-- FOOTER WITH ADDITIONAL LINKS -->
     <footer>
       <div class="footer-content">
@@ -72,9 +81,6 @@
           <li><a href="https://heimdall.sheriffofpaddys.com" target="_blank">Heimdall</a></li>
         </ul>
       </div>
-      
-
-      
       <p class="footer-note">&copy; 2025 Sheriff of Paddys. All rights reserved.</p>
     </footer>
   </div>
