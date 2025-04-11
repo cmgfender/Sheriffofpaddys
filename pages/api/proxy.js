@@ -24,9 +24,9 @@ export default async function handler(req, res) {
   const start = oneMonthAgo.toISOString().split("T")[0]; // format: YYYY-MM-DD
 
   // 3 months later
-  const threeMonthsLater = new Date(today);
-  threeMonthsLater.setMonth(threeMonthsLater.getMonth() + 3);
-  const end = threeMonthsLater.toISOString().split("T")[0];
+  const fourMonthsLater = new Date(today);
+  fourMonthsLater.setMonth(fourMonthsLater.getMonth() + 5);
+  const end = fourMonthsLater.toISOString().split("T")[0];
 
   // Base API URLs
   const SONARR_API_BASE = "https://sonarr.sheriffofpaddys.com/api/v3/calendar";
