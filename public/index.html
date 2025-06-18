@@ -1,3 +1,4 @@
+<!-- Updated index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,7 +12,7 @@
   <!-- FullCalendar CSS -->
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
 
-  <!-- Our custom CSS -->
+  <!-- Custom CSS -->
   <link rel="stylesheet" href="public/style.css" />
 
   <!-- FullCalendar JS -->
@@ -63,29 +64,51 @@
       <div id="calendar"></div>
     </main>
 
+    <!-- BOOK SERVICES SECTION -->
+    <div class="book-section">
+      <h3>Book Services</h3>
+      <div class="book-cards">
+        <div class="book-card">
+          <a href="https://root:glassmire@calibre.sheriffofpaddys.com/mobile" target="_blank" rel="noopener">
+            <h4>Calibre Content Server</h4>
+            <p>Download books directly from e-reader</p>
+          </a>
+        </div>
+        <div class="book-card">
+          <a href="https://library.sheriffofpaddys.com" target="_blank" rel="noopener">
+            <h4>Library</h4>
+            <p>Browse, view, and sort all books</p>
+          </a>
+        </div>
+        <div class="book-card">
+          <a href="https://lazy.sheriffofpaddys.com" target="_blank" rel="noopener">
+            <h4>LL</h4>
+            <p>Request books and send to downloader</p>
+          </a>
+        </div>
+      </div>
+    </div>
+
     <!-- Uptime Kuma Section -->
     <section id="uptimekuma-container">
       <h2>Server Uptime</h2>
       <iframe src="https://uptime.sheriffofpaddys.com/status/all" width="100%" height="500px" frameborder="0" title="Server Uptime"></iframe>
-      <!-- Optional container for displaying uptime data fetched via proxy -->
       <div id="uptimekuma-status" class="uptime-status"></div>
     </section>
 
-    <!-- FOOTER WITH ADDITIONAL LINKS -->
+    <!-- Footer -->
     <footer>
-      <div class="footer-content">
-        <h3>Additional Links</h3>
-        <ul>
-          <li><a href="https://calibre.sheriffofpaddys.com" target="_blank">Calibre Web</a></li>
-          <li><a href="https://root:glassmire@calibre.sheriffofpaddys.com/mobile" target="_blank">Calibre Kindle Login</a></li>
-          <li><a href="https://heimdall.sheriffofpaddys.com" target="_blank">Heimdall</a></li>
-        </ul>
+      <div class="footer-heimdall">
+        <a href="https://heimdall.sheriffofpaddys.com" target="_blank" rel="noopener">
+          <h4>Heimdall</h4>
+          <p>Docker container access</p>
+        </a>
       </div>
       <p class="footer-note">&copy; 2025 Sheriff of Paddys. All rights reserved.</p>
     </footer>
   </div>
 
-  <!-- Our custom JS -->
+  <!-- Custom JS -->
   <script src="public/script.js"></script>
   <script src="public/uptimescript.js"></script>
 </body>
