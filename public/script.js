@@ -128,8 +128,13 @@ document.addEventListener("DOMContentLoaded", function() {
   fetchReleases();
 
   // Modal handling for event details
-  modalClose.addEventListener("click", () => {
-    closeModal();
+  modalClose.addEventListener("click", closeModal);
+
+  // Close modal when clicking outside of it
+  window.addEventListener("click", (e) => {
+    if (e.target === eventModal) {
+      closeModal();
+    }
   });
 
   function openModalForEvent(event) {
