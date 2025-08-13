@@ -14,6 +14,19 @@ document.addEventListener("DOMContentLoaded", function() {
   const loadingOverlay = document.getElementById("loadingOverlay");
   const eventModal = document.getElementById("eventModal");
   const modalClose = document.getElementById("modalClose");
+  const themeToggle = document.getElementById("themeToggle");
+
+  const storedTheme = localStorage.getItem("theme");
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  if (storedTheme === "dark" || (!storedTheme && prefersDark)) {
+    document.body.classList.add("dark-mode");
+  }
+
+  themeToggle.addEventListener("click", () => {
+    document.body.classList.toggle("dark-mode");
+    const theme = document.body.classList.contains("dark-mode") ? "dark" : "light";
+    localStorage.setItem("theme", theme);
+  });
 
   // Show or hide the loading spinner
   function setLoading(state) {
