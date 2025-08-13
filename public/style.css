@@ -9,6 +9,7 @@
   --font-family-main: 'Roboto', sans-serif;
   --bg-light: #f9f9f9;
   --text-muted: #555;
+  --text-color: #333;
 }
 
 /* Basic Reset and Global Styles */
@@ -21,7 +22,29 @@
 body {
   font-family: var(--font-family-main), sans-serif;
   background: linear-gradient(to bottom right, var(--background-gradient-start), var(--background-gradient-end));
-  color: #333;
+  color: var(--text-color);
+}
+
+body.dark-mode {
+  --primary-color: #90caf9;
+  --primary-color-hover: #64b5f6;
+  --secondary-color: #f48fb1;
+  --background-gradient-start: #1e1e1e;
+  --background-gradient-end: #121212;
+  --bg-light: #333;
+  --text-color: #f5f5f5;
+  --text-muted: #aaa;
+}
+
+body.dark-mode footer {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .book-card,
+body.dark-mode #loginForm,
+body.dark-mode .footer-heimdall a {
+  background: #1e1e1e;
+  color: var(--text-color);
 }
 
 /* Login Overlay */
@@ -110,9 +133,28 @@ body {
   padding: 0 20px;
 }
 
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 header h1 {
   margin: 20px 0;
   color: var(--primary-color);
+}
+
+#themeToggle {
+  background: none;
+  border: 2px solid var(--primary-color);
+  border-radius: 20px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+#themeToggle:hover {
+  background: var(--primary-color);
+  color: #fff;
 }
 
 .search-container {
@@ -236,7 +278,7 @@ footer {
 }
 
 .footer-content ul li a {
-  color: #333;
+  color: var(--text-color);
   text-decoration: none;
 }
 
